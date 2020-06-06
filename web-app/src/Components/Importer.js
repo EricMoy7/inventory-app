@@ -1,11 +1,4 @@
-//Libraries
-const express = require("express");
-
-const app = express();
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  next();
-});
+const fetch = require("node-fetch");
 
 const credentials = {
   accessKey: "AKIAIPHR7XOXFJFBWQEQ",
@@ -23,8 +16,8 @@ const inventoryReportParams = {
   reportType: "_GET_FLAT_FILE_OPEN_LISTINGS_DATA_",
 };
 
-var responseNew = "";
-function request(function(req, res)) {
+function asyncTest() {
+  console.log("Starting requests");
   amazonMws.reports.submit(
     {
       Version: "2009-01-01",
@@ -37,22 +30,63 @@ function request(function(req, res)) {
         console.log("Error: ", error);
         return;
       } else {
-        console.log("Request sent with no errors.");
-        console.log("----------------------------");
-        return request(response.ReportRequestInfo.ReportRequestId);
+        console.log("Found request Id");
+        requestId = response.ReportRequestInfo.ReportRequestId;
+        getReportRequestList(requestId);
       }
     }
   );
 }
 
-console.log(request());
+function getReportRequestList(requestId) {
+  amazonMws.reports.search(
+    {
+      Version: "2009-01-01",
+      Action: "GetReportRequestList",
+      SellerId: credentials.sellerId,
+      "ReportRequestIdList.Id.1": requestId,
+    },
+    function (error, response) {
+      if (error) {
+        console.log("Error (ReportList)", error);
+        return;
+      } else {
+        if (response.ReportRequestInfo.ReportProcessingStatus === "_DONE_") {
+          console.log("Success, report is now availible");
+          reportId = response.ReportRequestInfo.GeneratedReportId;
+          reportId = reportId.toString();
+          getReport(reportId);
+        } else {
+          setTimeout(() => {
+            getReportRequestList(requestId.toString());
+          }, 10000);
+        }
+      }
+    }
+  );
+}
 
-// function sleep(milliseconds) {
-//   let timeStart = new Date().getTime();
-//   while (true) {
-//     let elapsedTime = new Date().getTime() - timeStart;
-//     if (elapsedTime > milliseconds) {
-//       break;
-//     }
-//   }
-// }
+function getReport(Id) {
+  amazonMws.reports.search(
+    {
+      Version: "2009-01-01",
+      Action: "GetReport",
+      SellerId: credentials.sellerId,
+      ReportId: Id,
+    },
+    function (error, response) {
+      if (error) {
+        console.log("error ", error);
+        return;
+      } else {
+        Object.keys(response.data).forEach((key) => {
+          fetch(
+            `http://localhost:3000/products/add?msku=${key}&asin=${response[key]}`
+          );
+        });
+      }
+    }
+  );
+}
+
+asyncTest();
