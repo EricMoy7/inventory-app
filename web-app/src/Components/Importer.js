@@ -79,11 +79,7 @@ function getReport(Id) {
         console.log("error ", error);
         return;
       } else {
-        Object.keys(response.data).forEach((key) => {
-          fetch(
-            `http://localhost:3000/products/add?msku=${key}&asin=${response[key]}`
-          );
-        });
+        body = response.data;
       }
     }
   );
