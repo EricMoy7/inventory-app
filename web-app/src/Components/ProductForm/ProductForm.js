@@ -40,6 +40,8 @@ class ProductForm extends React.Component {
       </Row>
     );
   }
+
+  addProduct() {}
 }
 
 export default ProductForm;
