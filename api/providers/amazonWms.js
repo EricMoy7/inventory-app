@@ -1,5 +1,5 @@
 module.exports = function AmazonWmsProvider(amazonWmsConfig) {
-    const amazonMws = require("../../../node_modules/amazon-mws/lib/amazon-mws")(
+    const amazonMws = require("../node_modules/amazon-mws/lib/amazon-mws")(
         amazonWmsConfig.credentials.accessKey,
         amazonWmsConfig.credentials.secretKey
     );

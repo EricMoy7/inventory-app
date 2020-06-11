@@ -100,15 +100,22 @@ Promise.all([
 ])
 .then(([]) => {
     /**
+     * Init providers
+     */
+    const amazonWmsInstance = require('./providers/amazonWms')(config.amazonWms);
+    
+    /**
      * Import the components. Each component is an instance of an ExpressJS router.
      * Here the application (general utility) component is loaded.
      */
     const productComponent = require('./components/product')(config, connection);
+    const wmsComponent = require('./components/amazonWms')(amazonWmsInstance);
 
     /**
      * Bind the components to the express application
      */
     app.use('/product', productComponent);
+    app.use('/wms', wmsComponent);
 
     app.use('*', notFoundErrors);
     app.use(logErrors);
