@@ -8,7 +8,7 @@ module.exports = {
         password: "1295fr1295fr",
         database: "nodemysql"
     },
-    "amazonWms": {
+    "amazonMws": {
         credentials: {
             accessKey: "AKIAIPHR7XOXFJFBWQEQ",
             secretKey: "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"

@@ -1,11 +1,11 @@
 /**
- * This is just a wms router
+ * This is just a mws router
  */
 
 const express = require('express');
 const bodyParser = require('body-parser');
 
-module.exports = function WmsRouter(wmsController) {
+module.exports = function MwsRouter(mwsController) {
 
     const router = express.Router();
 
@@ -13,7 +13,7 @@ module.exports = function WmsRouter(wmsController) {
     router.use(bodyParser.json());
 
     router.get('/reports', (req, res, next) => {
-        wmsController.getReport()
+        mwsController.getReport()
             .then((data) => {
                 res.status(200).send(data);
             })
