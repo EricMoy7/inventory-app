@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from 'react';
 import {
   Form,
   FormGroup,
@@ -9,10 +9,10 @@ import {
   Row,
   Col,
   CardTitle,
-} from "reactstrap";
-import "./ProductForm.css";
+} from 'reactstrap';
+import './ProductForm.css';
 
-class ProductForm extends React.Component {
+class ProductForm extends Component {
   render() {
     return (
       <Row>

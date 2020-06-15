@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import ProductForm from "../ProductForm/ProductForm";
 import Home from "../Home/Home";
 import NavigationBar from "../NavigationBar/NavigationBar";
+import Products from "../Products/Products";
 
 class Navigation extends React.Component {
   render() {
@@ -15,6 +16,7 @@ class Navigation extends React.Component {
         />
         <Router>
           <Switch>
+            <Route path="/products" component={Products} />
             <Route path="/add-products" component={ProductForm} />
             <Route path="/" component={Home} exact />
           </Switch>
