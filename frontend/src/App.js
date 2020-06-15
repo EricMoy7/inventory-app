@@ -1,7 +1,7 @@
 // App.js - Input editable UI
 
 import React, { useState } from "react";
-import Navigation from "./components/Navigation/Navigation";
+import Navigation from "./Components/Navigation/Navigation";
 
 function App() {
   // State for the input
