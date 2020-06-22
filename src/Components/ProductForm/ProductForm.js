@@ -217,3 +217,71 @@ class ProductForm extends Component {
 }
 
 export default ProductForm;
+
+/*import React from "react";
+import Firebase from "../Firestore/Firestore";
+
+class Product extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      email: "",
+      firstName: "",
+      lastName: "",
+    };
+  }
+
+  updateInput = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+    console.log("Changing State");
+    console.log(this.state);
+  };
+
+  addUser = (e) => {
+    console.log("Button Clicked");
+    e.preventDefault();
+    const db = Firebase.firestore();
+    const userRef = db.collection("users").add({
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+    });
+    this.setState({
+      firstName: "",
+      lastName: "",
+      email: "",
+    });
+  };
+
+  render() {
+    return (
+      <form onSubmit={this.addUser}>
+        <input
+          type="text"
+          name="firstName"
+          placeholder="firstName"
+          onChange={this.updateInput}
+          value={this.state.firstName}
+        />
+        <input
+          type="text"
+          name="lastName"
+          placeholder="lastName"
+          onChange={this.updateInput}
+          value={this.state.lastName}
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={this.updateInput}
+          value={this.state.email}
+        />
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+}
+export default Product; */
