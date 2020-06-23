@@ -23,57 +23,18 @@ class ProductForm extends Component {
   state = {
     msku: null,
     asin: null,
-    name: null,
     product_cost: null,
     supplier: null,
-    report: null,
   };
 
-  onChangeMsku = (param) => {
-    const msku = typeof param === "string" ? param : param.target.value;
-    this.setState({ msku });
-  };
-
-  onChangeAsin = (param) => {
-    const asin = typeof param === "string" ? param : param.target.value;
-    this.setState({ asin });
-  };
-
-  onChangeName = (param) => {
-    const name = typeof param === "string" ? param : param.target.value;
-    this.setState({ name });
-  };
-
-  onChangeProductCost = (param) => {
-    const product_cost = typeof param === "string" ? param : param.target.value;
-    this.setState({ product_cost });
-  };
-
-  onChangeSupplier = (param) => {
-    const supplier = typeof param === "string" ? param : param.target.value;
-    this.setState({ supplier });
+  updateInput = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
   };
 
   onGetReport = async () => {
     const restockReport = API.get("/mws/reports");
-  };
-
-  onButtonAdd = async () => {
-    const { msku, asin, name, product_cost, supplier } = this.state;
-    const product = { product: { msku, asin, name, product_cost, supplier } };
-
-    try {
-      const { data } = await API.post("/product/data", product);
-
-      if (data) {
-        NotificationManager.success(
-          "Successfully added the product",
-          "Product"
-        );
-      }
-    } catch (err) {
-      NotificationManager.error("Error adding the product", "Product");
-    }
   };
 
   onGetReport = async () => {
@@ -134,8 +95,7 @@ class ProductForm extends Component {
                     <Input
                       name="msku"
                       value={msku}
-                      onChange={this.onChangeMsku}
-                      onBlur={this.checkMSKU}
+                      onChange={this.updateInput}
                     />
                   </InputGroup>
 
@@ -148,20 +108,7 @@ class ProductForm extends Component {
                     <Input
                       name="asin"
                       value={asin}
-                      onChange={this.onChangeAsin}
-                    />
-                  </InputGroup>
-
-                  <br />
-
-                  <InputGroup>
-                    <InputGroupAddon addonType="prepend">
-                      <InputGroupText>Name</InputGroupText>
-                    </InputGroupAddon>
-                    <Input
-                      name="name"
-                      value={name}
-                      onChange={this.onChangeName}
+                      onChange={this.updateInput}
                     />
                   </InputGroup>
 
@@ -174,7 +121,7 @@ class ProductForm extends Component {
                     <Input
                       name="product_cost"
                       value={product_cost}
-                      onChange={this.onChangeProductCost}
+                      onChange={this.updateInput}
                     />
                   </InputGroup>
 
@@ -187,26 +134,18 @@ class ProductForm extends Component {
                     <Input
                       name="supplier"
                       value={supplier}
-                      onChange={this.onChangeSupplier}
+                      onChange={this.updateInput}
                     />
                   </InputGroup>
 
                   <br />
 
-                  <Button
-                    className="btn-block"
-                    color="primary"
-                    onClick={this.onButtonAdd}
-                  >
+                  <Button className="btn-block" color="primary">
                     Add
                   </Button>
                 </Form>
               </CardBody>
             </Card>
-          </Col>
-
-          <Col>
-            <Button onClick={this.onGetReport}>Get Report</Button>
           </Col>
         </Row>
 
