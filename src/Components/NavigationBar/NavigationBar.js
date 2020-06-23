@@ -1,29 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  Collapse,
   Navbar,
-  NavbarToggler,
   NavbarBrand,
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   NavbarText,
 } from "reactstrap";
+import { auth } from "../Firebase";
 
-const NavigationBar = (props) => {
-  const [isOpen, setIsOpen] = useState(false);
+class NavigationBar extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      user: null,
+    };
+  }
 
-  const toggle = () => setIsOpen(!isOpen);
-  return (
-    <div>
-      <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">Stealth</NavbarBrand>
-        <NavbarToggler onClick={toggle} />
-        <Collapse isOpen={isOpen} navbar>
+  componentDidMount() {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ user });
+      }
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <Navbar color="light" light expand="md">
+          <NavbarBrand href="/">Stealth</NavbarBrand>
           <Nav className="mr-auto" navbar>
             <NavItem>
               <NavLink href="/products">All Products</NavLink>
@@ -32,20 +38,25 @@ const NavigationBar = (props) => {
               <NavLink href="/add-products">Add Products</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="/login">Login</NavLink>
-            </NavItem>
-            <NavItem>
               <NavLink href="/registration">Register</NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink href="/logout">Logout</NavLink>
-            </NavItem>
+          </Nav>
+          <Nav>
+            {this.state.user ? (
+              <NavItem>
+                <NavLink href="/logout">Logout</NavLink>
+              </NavItem>
+            ) : (
+              <NavItem>
+                <NavLink href="/login">Login</NavLink>
+              </NavItem>
+            )}
           </Nav>
           <NavbarText>Simple Text</NavbarText>
-        </Collapse>
-      </Navbar>
-    </div>
-  );
-};
+        </Navbar>
+      </div>
+    );
+  }
+}
 
 export default NavigationBar;
