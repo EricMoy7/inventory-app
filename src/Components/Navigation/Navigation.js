@@ -4,6 +4,9 @@ import ProductForm from "../ProductForm/ProductForm";
 import Home from "../Home/Home";
 import NavigationBar from "../NavigationBar/NavigationBar";
 import Products from "../Products/Products";
+import Login from "../UserAuth/Login/Login";
+import Logout from "../UserAuth/Logout/Logout";
+import Registration from "../UserAuth/Registration/Registration";
 
 class Navigation extends React.Component {
   render() {
@@ -18,6 +21,9 @@ class Navigation extends React.Component {
           <Switch>
             <Route path="/products" component={Products} />
             <Route path="/add-products" component={ProductForm} />
+            <Route path="/login" component={Login} />
+            <Route path="/logout" component={Logout} />
+            <Route path="/registration" component={Registration} />
             <Route path="/" component={Home} exact />
           </Switch>
         </Router>

@@ -18,7 +18,6 @@ const NavigationBar = (props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
-
   return (
     <div>
       <Navbar color="light" light expand="md">
@@ -31,6 +30,15 @@ const NavigationBar = (props) => {
             </NavItem>
             <NavItem>
               <NavLink href="/add-products">Add Products</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/login">Login</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/registration">Register</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/logout">Logout</NavLink>
             </NavItem>
           </Nav>
           <NavbarText>Simple Text</NavbarText>
