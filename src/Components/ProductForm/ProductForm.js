@@ -32,10 +32,13 @@ class ProductForm extends Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
+<<<<<<< HEAD
   };
 
   addProduct = () => {
     var { msku, asin, product_cost, supplier } = this.state;
+=======
+>>>>>>> 65aab00f7811608fa2c32e1a58b1352befe6dff2
   };
 
   //Getting report to check
