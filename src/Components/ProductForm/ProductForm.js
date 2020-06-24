@@ -18,6 +18,7 @@ import {
   NotificationContainer,
   NotificationManager,
 } from "react-notifications";
+import { db } from "../Firebase";
 
 class ProductForm extends Component {
   state = {
@@ -33,6 +34,11 @@ class ProductForm extends Component {
     });
   };
 
+  addProduct = () => {
+    var { msku, asin, product_cost, supplier } = this.state;
+  };
+
+  //Getting report to check
   onGetReport = async () => {
     const restockReport = API.get("/mws/reports");
   };
@@ -87,7 +93,7 @@ class ProductForm extends Component {
             <Card>
               <CardBody>
                 <CardTitle className="CardTitle">New SKU Form</CardTitle>
-                <Form>
+                <Form onSubmit={this.addProduct}>
                   <InputGroup>
                     <InputGroupAddon addonType="prepend">
                       <InputGroupText>MSKU</InputGroupText>
