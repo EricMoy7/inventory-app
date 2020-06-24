@@ -1,3 +1,12 @@
+/* UserID or uid is saved immediately on login into the sessionStorage
+Use the following lines of code to retrieve data on any file
+
+const userData = JSON.parse(sessionStorage.getItem("userData"));
+    console.log(userData.uid);
+
+The uid can be used to access the database for each user.
+*/
+
 import Firebase from "firebase";
 
 const firebaseConfig = {
@@ -18,8 +27,10 @@ const db = Firebase.firestore();
 auth.onAuthStateChanged((user) => {
   if (user) {
     console.log("User has logged in");
+    sessionStorage.setItem("userData", JSON.stringify(user));
   } else {
     console.log("User has logged out");
+    sessionStorage.setItem("userData", null);
   }
 });
 
