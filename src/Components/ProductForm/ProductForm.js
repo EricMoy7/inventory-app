@@ -32,13 +32,29 @@ class ProductForm extends Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
-<<<<<<< HEAD
+    console.log(this.state);
   };
 
-  addProduct = () => {
-    var { msku, asin, product_cost, supplier } = this.state;
-=======
->>>>>>> 65aab00f7811608fa2c32e1a58b1352befe6dff2
+  addProduct = (e) => {
+    e.preventDefault();
+    let { msku, asin, product_cost, supplier } = this.state;
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
+
+    let userInventory = db
+      .collection("users")
+      .doc(userData.uid)
+      .collection("MSKU")
+      .doc(msku);
+
+    userInventory.set(
+      {
+        msku,
+        asin,
+        product_cost,
+        supplier,
+      },
+      { merge: true }
+    );
   };
 
   //Getting report to check
