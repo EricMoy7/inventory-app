@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import { db } from "../Firebase";
 import MaterialTable from "material-table";
+import {
+  NotificationContainer,
+  NotificationManager,
+} from "react-notifications";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -86,8 +90,8 @@ class Product extends Component {
             search: true,
           }}
           editable={{
-            onRowUpdateCancelled: rowData => {
-              NotificationManager.cancel{`The edit for ${rowData.MSKU} has been cancelled`}
+            onRowUpdateCancelled: (rowData) => {
+              console.log("cancelled");
             },
             onRowAdd: (newData) =>
               new Promise((resolve, reject) => {
