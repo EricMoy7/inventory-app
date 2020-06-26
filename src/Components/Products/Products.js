@@ -1,64 +1,131 @@
 import React, { Component } from "react";
-import API from "../../utils/api";
-import config from "../../config/config";
-import { MDBDataTable } from "mdbreact";
 import { db } from "../Firebase";
-import { AddBox, ArrowDownward } from "@material-ui/icons";
+import MaterialTable from "material-table";
 
 class Product extends Component {
+  //Initialize empty object to store product data
   state = {
     products: {},
   };
 
+  //On load function
   async componentDidMount() {
+    //getting data...
+    this.getDataFromDB();
+  }
+
+  async getDataFromDB() {
+    //Pulling user data from session storage
+    //userData is stored as soon as the user logins check firebase.js
     const userData = JSON.parse(sessionStorage.getItem("userData"));
     const uid = userData.uid;
+
+    //Initializing empty array for column headers and row data
     var colList = [];
     var rowList = [];
 
-    let user = db.collection("users").doc(uid).collection("MSKU");
-    user.orderBy("desc");
-    await user
+    //Pulling settings data from user database
+    //TODO: Create settings for user provided headers
+    let userSet = db
+      .collection("users")
+      .doc(uid)
+      .collection("settings")
+      .doc("tableHeaders");
+    //Getting user column headers
+    await userSet.get().then((snap) => {
+      //Saving column headers to previous empty array
+      colList = snap.data().columns;
+    });
+
+    //Pulling user inventory data from user database
+    let userInv = db.collection("users").doc(uid).collection("MSKU");
+    //Sort data by ascending
+    userInv.orderBy("asc");
+    //Getting object data
+    await userInv
       .get()
       .then((snap) => {
+        //Initialize temporary object storage for parsing
         const items = {};
+        //Loop through each key
         snap.forEach((item) => {
+          //Restructuring object to meet table format req
           items[item.id] = item.data();
           return items;
         });
-        //Items is an object with MSKU as the key. The value of each key is the data of the key in another object
-        const firstMsku = Object.keys(items)[0];
-        const colObj = items[firstMsku];
 
-        Object.keys(colObj).forEach((key) => {
-          colList.push({
-            label: key.toUpperCase(),
-            field: key.toLowerCase(),
-            sort: "asc",
-            width: 150,
-          });
-        });
-
+        //Looping through previous restructure and pushing to empty array
         Object.keys(items).forEach((key) => {
           rowList.push(items[key]);
         });
       })
       .then(() => {
+        //setting state to finished arrays
         this.setState({ products: { columns: colList, rows: rowList } });
       });
   }
 
   render() {
+    const { useState } = React;
     const { products } = this.state;
+
+    const columns = products.columns;
+    const data = products.rows;
+
     return (
       <div>
-        <MDBDataTable
-          bordered
-          small
-          noBottomColumns
-          hover
-          info={false}
-          data={products}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
+        <MaterialTable
+          columns={columns}
+          data={data}
+          title="Inventory"
+          options={{
+            search: true,
+          }}
+          editable={{
+            onRowUpdateCancelled: rowData => {
+              NotificationManager.cancel{`The edit for ${rowData.MSKU} has been cancelled`}
+            },
+            onRowAdd: (newData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  db.collection("users")
+                    .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
+                    .collection("MSKU")
+                    .doc(newData.MSKU)
+                    .set(newData);
+                  this.getDataFromDB();
+                  resolve();
+                }, 1000);
+              }),
+            onRowUpdate: (newData, oldData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  db.collection("users")
+                    .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
+                    .collection("MSKU")
+                    .doc(oldData.MSKU)
+                    .set(newData);
+
+                  resolve();
+                }, 1000);
+              }),
+            onRowDelete: (oldData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  db.collection("users")
+                    .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
+                    .collection("MSKU")
+                    .doc(oldData.MSKU)
+                    .delete();
+                  this.getDataFromDB();
+                  resolve();
+                }, 1000);
+              }),
+          }}
         />
       </div>
     );
