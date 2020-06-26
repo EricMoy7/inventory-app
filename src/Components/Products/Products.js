@@ -39,6 +39,12 @@ class Product extends Component {
     await userSet.get().then((snap) => {
       //Saving column headers to previous empty array
       colList = snap.data().columns;
+
+      colList.map((column, idx) => {
+        if (column.title === 'Image') {
+          colList[idx] = { ...column, render: rowData => <img src={ rowData.imageUrl } style={{ width: 100, height: 100 }} /> };
+        }
+      });
     });
 
     //Pulling user inventory data from user database
