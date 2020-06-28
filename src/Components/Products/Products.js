@@ -41,8 +41,13 @@ class Product extends Component {
       colList = snap.data().columns;
 
       colList.map((column, idx) => {
-        if (column.title === 'Image') {
-          colList[idx] = { ...column, render: rowData => <img src={ rowData.imageUrl } style={{ width: 100, height: 100 }} /> };
+        if (column.title === "Image") {
+          colList[idx] = {
+            ...column,
+            render: (rowData) => (
+              <img src={rowData.imageUrl} style={{ width: 100, height: 100 }} />
+            ),
+          };
         }
       });
     });
@@ -93,6 +98,7 @@ class Product extends Component {
           data={data}
           title="Inventory"
           options={{
+            exportButton: true,
             search: true,
           }}
           editable={{
@@ -107,14 +113,16 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(newData.MSKU)
                     .set(newData);
-                  this.getDataFromDB();
                   resolve();
                 }, 1000);
+              }).then(() => {
+                this.getDataFromDB();
               }),
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  db.collection("users")
+                setTimeout(async () => {
+                  await db
+                    .collection("users")
                     .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
                     .collection("MSKU")
                     .doc(oldData.MSKU)
@@ -122,6 +130,8 @@ class Product extends Component {
 
                   resolve();
                 }, 1000);
+              }).then(() => {
+                this.getDataFromDB();
               }),
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
@@ -131,9 +141,10 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(oldData.MSKU)
                     .delete();
-                  this.getDataFromDB();
                   resolve();
                 }, 1000);
+              }).then(() => {
+                this.getDataFromDB();
               }),
           }}
         />
