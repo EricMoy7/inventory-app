@@ -45,7 +45,7 @@ class Product extends Component {
           colList[idx] = {
             ...column,
             render: (rowData) => (
-              <img src={rowData.imageUrl} style={{ width: 100, height: 100 }} />
+              <img src={rowData.imageUrl} style={{ width: 75, height: 75 }} />
             ),
           };
         }
@@ -101,7 +101,13 @@ class Product extends Component {
             grouping: true,
             exportButton: true,
             search: true,
+<<<<<<< HEAD
+            selection: true,
+            pageSize: 20,
+            pageSizeOptions: [10, 20, 30, 50, 100, 200],
+=======
             actionsColumnIndex: -1,
+>>>>>>> 69302e43de4a78d3a467d040f988465df0f01309
           }}
           editable={{
             onRowUpdateCancelled: (rowData) => {
