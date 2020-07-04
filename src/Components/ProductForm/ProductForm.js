@@ -22,10 +22,11 @@ import { db } from "../Firebase";
 
 class ProductForm extends Component {
   state = {
-    msku: null,
-    asin: null,
+    MSKU: null,
+    ASIN: null,
     product_cost: null,
     supplier: null,
+    listMSKU: null,
   };
 
   updateInput = (e) => {
@@ -37,19 +38,19 @@ class ProductForm extends Component {
 
   addProduct = (e) => {
     e.preventDefault();
-    let { msku, asin, product_cost, supplier } = this.state;
+    let { MSKU, ASIN, product_cost, supplier } = this.state;
     const userData = JSON.parse(sessionStorage.getItem("userData"));
 
     let userInventory = db
       .collection("users")
       .doc(userData.uid)
       .collection("MSKU")
-      .doc(msku);
+      .doc(MSKU);
 
     userInventory.set(
       {
-        msku,
-        asin,
+        MSKU,
+        ASIN,
         product_cost,
         supplier,
       },
@@ -57,53 +58,28 @@ class ProductForm extends Component {
     );
   };
 
-  //Getting report to check
-  onGetReport = async () => {
-    const restockReport = API.get("/mws/reports");
-  };
+  addBulkMSKU = (e) => {
+    e.preventDefault();
+    const stringMSKU = this.state.listMSKU;
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
 
-  onGetReport = async () => {
-    const restockReport = await API.get("/mws/reports")
-      .then((response) => {
-        let reportData = [];
-
-        const arrayData = response.data.data;
-        reportData.push(["Merchant SKU", "Name", "ASIN"]);
-        for (let i = 0; i < arrayData.length; i++) {
-          reportData.push([
-            arrayData[i]["Merchant SKU"],
-            arrayData[i]["Product Name"],
-            arrayData[i]["ASIN"],
-          ]);
-        }
-        sessionStorage.setItem("reportData", JSON.stringify(reportData));
-        console.log(JSON.parse(sessionStorage.getItem("reportData")));
-      })
-      .then(() =>
-        NotificationManager.success("The report was successfully imported")
-      );
-  };
-
-  checkMSKU = () => {
-    const reportData = JSON.parse(sessionStorage.getItem("reportData"));
-    const msku = this.state.msku;
-    for (let i = 0; i < reportData.length; i++) {
-      if (reportData[i][0] === msku) {
-        if (
-          window.confirm(
-            "Product has been found in inventory. Add ASIN and Product name?"
-          )
-        ) {
-          console.log("hi");
-          this.onChangeAsin(reportData[i][2]);
-        }
-        break;
-      }
+    const listMSKU = stringMSKU.split(/\r?\n/);
+    for (let i = 0; i < listMSKU.length; i++) {
+      db.collection("users")
+        .doc(userData.uid)
+        .collection("MSKU")
+        .doc(listMSKU[i])
+        .set(
+          {
+            MSKU: listMSKU[i],
+          },
+          { merge: true }
+        );
     }
   };
 
   render() {
-    const { msku, asin, name, product_cost, supplier } = this.state;
+    const { MSKU, ASIN, name, product_cost, supplier } = this.state;
 
     return (
       <div>
@@ -118,8 +94,8 @@ class ProductForm extends Component {
                       <InputGroupText>MSKU</InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      name="msku"
-                      value={msku}
+                      name="MSKU"
+                      value={MSKU}
                       onChange={this.updateInput}
                     />
                   </InputGroup>
@@ -131,8 +107,8 @@ class ProductForm extends Component {
                       <InputGroupText>ASIN</InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      name="asin"
-                      value={asin}
+                      name="ASIN"
+                      value={ASIN}
                       onChange={this.updateInput}
                     />
                   </InputGroup>
@@ -171,6 +147,28 @@ class ProductForm extends Component {
                 </Form>
               </CardBody>
             </Card>
+
+            <Card>
+              <CardBody>
+                <CardTitle className="CardTitle">Bulk MSKU Add</CardTitle>
+                <InputGroup>
+                  <Form onSubmit={this.addBulkMSKU}>
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>MSKUS</InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      name="listMSKU"
+                      value={this.listMSKU}
+                      type="textarea"
+                      onChange={this.updateInput}
+                    />
+                    <Button className="btn-block" color="primary">
+                      Add
+                    </Button>
+                  </Form>
+                </InputGroup>
+              </CardBody>
+            </Card>
           </Col>
         </Row>
 
@@ -181,71 +179,3 @@ class ProductForm extends Component {
 }
 
 export default ProductForm;
-
-/*import React from "react";
-import Firebase from "../Firestore/Firestore";
-
-class Product extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      email: "",
-      firstName: "",
-      lastName: "",
-    };
-  }
-
-  updateInput = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    });
-    console.log("Changing State");
-    console.log(this.state);
-  };
-
-  addUser = (e) => {
-    console.log("Button Clicked");
-    e.preventDefault();
-    const db = Firebase.firestore();
-    const userRef = db.collection("users").add({
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      email: this.state.email,
-    });
-    this.setState({
-      firstName: "",
-      lastName: "",
-      email: "",
-    });
-  };
-
-  render() {
-    return (
-      <form onSubmit={this.addUser}>
-        <input
-          type="text"
-          name="firstName"
-          placeholder="firstName"
-          onChange={this.updateInput}
-          value={this.state.firstName}
-        />
-        <input
-          type="text"
-          name="lastName"
-          placeholder="lastName"
-          onChange={this.updateInput}
-          value={this.state.lastName}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={this.updateInput}
-          value={this.state.email}
-        />
-        <button type="submit">Submit</button>
-      </form>
-    );
-  }
-}
-export default Product; */
