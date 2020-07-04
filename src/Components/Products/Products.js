@@ -98,11 +98,16 @@ class Product extends Component {
           data={data}
           title="Inventory"
           options={{
+            grouping: true,
             exportButton: true,
             search: true,
+<<<<<<< HEAD
             selection: true,
             pageSize: 20,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
+=======
+            actionsColumnIndex: -1,
+>>>>>>> 69302e43de4a78d3a467d040f988465df0f01309
           }}
           editable={{
             onRowUpdateCancelled: (rowData) => {
