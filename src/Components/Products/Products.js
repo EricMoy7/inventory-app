@@ -87,6 +87,9 @@ class Product extends Component {
     const columns = products.columns;
     const data = products.rows;
 
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
+    const uid = userData.uid;
+
     return (
       <div>
         <link
@@ -94,20 +97,43 @@ class Product extends Component {
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
         <MaterialTable
+          actions={[
+            {
+              icon: "update",
+              tooltip: "Update Inventory",
+              isFreeAction: true,
+              onClick: () => {
+                fetch(
+                  "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory"
+                );
+              },
+            },
+            {
+              icon: "camera_alt",
+              tooltip: "Update Photos",
+              isFreeAction: true,
+              onClick: () => {
+                fetch(
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures?uid=${uid}`,
+                  { mode: "no-cors" }
+                );
+              },
+            },
+          ]}
           columns={columns}
           data={data}
           title="Inventory"
           options={{
+            filtering: true,
             grouping: true,
             exportButton: true,
             search: true,
-<<<<<<< HEAD
             selection: true,
             pageSize: 20,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
-=======
-            actionsColumnIndex: -1,
->>>>>>> 69302e43de4a78d3a467d040f988465df0f01309
+            addRowPosition: "first",
+            headerStyle: { position: "sticky", top: 0 },
+            maxBodyHeight: "650px",
           }}
           editable={{
             onRowUpdateCancelled: (rowData) => {
