@@ -19,6 +19,7 @@ import {
   NotificationManager,
 } from "react-notifications";
 import { db } from "../Firebase";
+import Uploader from "./csvUploader";
 
 class ProductForm extends Component {
   state = {
@@ -147,7 +148,9 @@ class ProductForm extends Component {
                 </Form>
               </CardBody>
             </Card>
+          </Col>
 
+          <Col sm="3">
             <Card>
               <CardBody>
                 <CardTitle className="CardTitle">Bulk MSKU Add</CardTitle>
@@ -167,6 +170,14 @@ class ProductForm extends Component {
                     </Button>
                   </Form>
                 </InputGroup>
+              </CardBody>
+            </Card>
+          </Col>
+
+          <Col sm="3">
+            <Card>
+              <CardBody>
+                <Uploader />
               </CardBody>
             </Card>
           </Col>

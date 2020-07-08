@@ -104,7 +104,8 @@ class Product extends Component {
               isFreeAction: true,
               onClick: () => {
                 fetch(
-                  "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory"
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory?uid=${uid}`,
+                  { mode: "no-cors" }
                 );
               },
             },
