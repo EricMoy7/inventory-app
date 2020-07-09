@@ -49,6 +49,7 @@ class csvUploader extends Component {
           ASIN: header.indexOf("ASIN"),
           product_cost: header.indexOf("Buy Price"),
           supplier: header.indexOf("Supplier"),
+          supplier_url: header.indexOf("Supplier URL"),
         };
 
         for (let i = 1; i < data.length; i++) {
@@ -66,6 +67,7 @@ class csvUploader extends Component {
                 ASIN: data[i][headerIndex.ASIN],
                 product_cost: data[i][headerIndex.product_cost],
                 supplier: data[i][headerIndex.supplier],
+                supplier_url: data[i][headerIndex.supplier_url],
               },
               { merge: true }
             );

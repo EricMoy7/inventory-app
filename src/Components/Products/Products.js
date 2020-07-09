@@ -99,6 +99,34 @@ class Product extends Component {
         <MaterialTable
           actions={[
             {
+              icon: "Shop",
+              tooltip: "Buy from supplier",
+              onClick: (event, rowData) => {
+                let MSKUS = [];
+                for (let i = 0; i < rowData.length; i++) {
+                  MSKUS.push(rowData[i].MSKU);
+                }
+
+                const userData = JSON.parse(sessionStorage.getItem("userData"));
+                const uid = userData.uid;
+
+                var dbLookup = db
+                  .collection("users")
+                  .doc(uid)
+                  .collection("MSKU");
+                console.log(MSKUS);
+                var query = dbLookup.where("MSKU", "in", MSKUS);
+                query.get().then((Snap) => {
+                  Snap.forEach((doc) => {
+                    const productData = doc.data();
+                    //Add if statements for blank
+                    window.open(productData.supplier_url, productData.MSKU);
+                    console.log("New tab opened");
+                  });
+                });
+              },
+            },
+            {
               icon: "update",
               tooltip: "Update Inventory",
               isFreeAction: true,
@@ -125,6 +153,7 @@ class Product extends Component {
           data={data}
           title="Inventory"
           options={{
+            actionsColumnIndex: -1,
             filtering: true,
             grouping: true,
             exportButton: true,
