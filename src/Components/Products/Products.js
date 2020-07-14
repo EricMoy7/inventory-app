@@ -10,6 +10,7 @@ class Product extends Component {
   //Initialize empty object to store product data
   state = {
     products: {},
+    selection: true,
   };
 
   //On load function
@@ -99,7 +100,8 @@ class Product extends Component {
         <MaterialTable
           actions={[
             {
-              icon: "Shop",
+              disabled: this.state.selection,
+              icon: "shop",
               tooltip: "Buy from supplier",
               onClick: (event, rowData) => {
                 let MSKUS = [];
@@ -158,7 +160,7 @@ class Product extends Component {
             grouping: true,
             exportButton: true,
             search: true,
-            selection: true,
+            selection: this.state.selection,
             pageSize: 20,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
             addRowPosition: "first",
