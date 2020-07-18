@@ -1,18 +1,31 @@
 import React, { Component } from "react";
 import { db } from "../Firebase";
 import MaterialTable from "material-table";
-import {
-  NotificationContainer,
-  NotificationManager,
-} from "react-notifications";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import LinkIcon from "@material-ui/icons/Link";
 
 class Product extends Component {
   //Initialize empty object to store product data
   state = {
     products: {},
-    selection: true,
+    selection: false,
+    singleAction: false,
+    multiAction: true,
   };
 
+  actionSwap() {
+    //true for single or multi means it is disabled
+    if (this.state.selection === false) {
+      this.setState({ singleAction: true, multiAction: false });
+    } else if (this.state.selection === true) {
+      this.setState({ singleAction: false, multiAction: true });
+    } else {
+      console.log("Error has occured in function actionSwap()");
+    }
+    console.log(this.state.multiAction);
+    this.forceUpdate();
+  }
   //On load function
   async componentDidMount() {
     //getting data...
@@ -82,7 +95,6 @@ class Product extends Component {
   }
 
   render() {
-    const { useState } = React;
     const { products } = this.state;
 
     const columns = products.columns;
@@ -100,7 +112,72 @@ class Product extends Component {
         <MaterialTable
           actions={[
             {
-              disabled: this.state.selection,
+              icon: LinkIcon,
+              tooltip: "Go to Amazon Page",
+              onClick: (event, rowData) => {
+                const asin = rowData.ASIN;
+                const amazonUrl = `https://www.amazon.com/dp/${asin}`;
+                window.open(amazonUrl, asin);
+              },
+            },
+            {
+              icon: VisibilityIcon,
+              tooltip: "Show/Hide URLS",
+              isFreeAction: true,
+              onClick: () => {
+                const headers = db
+                  .collection("users")
+                  .doc(uid)
+                  .collection("settings")
+                  .doc("tableHeaders");
+                headers
+                  .get()
+                  .then((doc) => {
+                    if (doc.exists) {
+                      doc = doc.data();
+                      for (let i = 0; i < doc["columns"].length; i++) {
+                        if (doc["columns"][i]["field"] === "supplier_url") {
+                          if (doc["columns"][i]["hidden"] === true) {
+                            doc["columns"][i]["hidden"] = false;
+                          } else if (doc["columns"][i]["hidden"] === false) {
+                            doc["columns"][i]["hidden"] = true;
+                          } else {
+                            console.log(
+                              "An error has occured on switching URL hidden boolean"
+                            );
+                          }
+                        }
+                      }
+                      headers.set(doc);
+                      this.getDataFromDB();
+                    } else {
+                      console.log("Headers document does not exist!");
+                    }
+                  })
+                  .catch((error) => {
+                    console.log("Error getting document:", error);
+                  });
+              },
+            },
+            {
+              icon: CheckBoxOutlineBlankIcon,
+              tooltip: "Toggle selection",
+              onClick: () => {
+                this.actionSwap();
+                if (this.state.selection === true) {
+                  this.setState({ selection: false });
+                } else if (this.state.selection === false) {
+                  this.setState({ selection: true });
+                } else {
+                  console.log(
+                    "An error has occured (Button: Toggle Selection)"
+                  );
+                }
+              },
+              isFreeAction: true,
+            },
+            {
+              disabled: this.state.multiAction,
               icon: "shop",
               tooltip: "Buy from supplier",
               onClick: (event, rowData) => {
@@ -108,9 +185,6 @@ class Product extends Component {
                 for (let i = 0; i < rowData.length; i++) {
                   MSKUS.push(rowData[i].MSKU);
                 }
-
-                const userData = JSON.parse(sessionStorage.getItem("userData"));
-                const uid = userData.uid;
 
                 var dbLookup = db
                   .collection("users")
@@ -161,7 +235,7 @@ class Product extends Component {
             exportButton: true,
             search: true,
             selection: this.state.selection,
-            pageSize: 20,
+            pageSize: 50,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
             addRowPosition: "first",
             headerStyle: { position: "sticky", top: 0 },
