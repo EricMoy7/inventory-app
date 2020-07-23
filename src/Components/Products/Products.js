@@ -4,6 +4,7 @@ import MaterialTable from "material-table";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import LinkIcon from "@material-ui/icons/Link";
+import StoreIcon from "@material-ui/icons/Store";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -112,7 +113,17 @@ class Product extends Component {
         <MaterialTable
           actions={[
             {
+              icon: StoreIcon,
+              disabled: this.state.singleAction,
+              tooltip: "Go to supplier website",
+              onClick: (event, rowData) => {
+                const url = rowData.supplier_url;
+                window.open(url, rowData.MSKU);
+              },
+            },
+            {
               icon: LinkIcon,
+              disabled: this.state.singleAction,
               tooltip: "Go to Amazon Page",
               onClick: (event, rowData) => {
                 const asin = rowData.ASIN;
@@ -285,6 +296,7 @@ class Product extends Component {
                 }, 1000);
               }).then(() => {
                 this.getDataFromDB();
+                this.forceUpdate();
               }),
           }}
         />

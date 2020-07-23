@@ -14,10 +14,6 @@ import {
   Button,
 } from "reactstrap";
 import "./ProductForm.css";
-import {
-  NotificationContainer,
-  NotificationManager,
-} from "react-notifications";
 import { db } from "../Firebase";
 import Uploader from "./csvUploader";
 
@@ -34,7 +30,6 @@ class ProductForm extends Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
-    console.log(this.state);
   };
 
   addProduct = (e) => {
@@ -182,8 +177,6 @@ class ProductForm extends Component {
             </Card>
           </Col>
         </Row>
-
-        <NotificationContainer />
       </div>
     );
   }
