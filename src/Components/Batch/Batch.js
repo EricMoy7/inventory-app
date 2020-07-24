@@ -14,16 +14,45 @@ import {
   Button,
 } from "reactstrap";
 import MaterialTable from "material-table";
+import NotificationSystem from "react-notification-system";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
 
 class Batch extends React.Component {
+  notificationSystem = React.createRef();
   constructor(props) {
     super(props);
     this.state = {
       batchName: null,
     };
-    this.userData = JSON.parse(sessionStorage.getItem("userData"));
-    this.uid = this.userData.uid;
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
+    this.uid = userData.uid;
   }
+
+  componentWillMount = () => {
+    this.getCurrentBatches();
+  };
+
+  getCurrentBatches = () => {
+    const currentBatches = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+
+    currentBatches.onSnapshot((snap) =>
+      snap.forEach((doc) => {
+        this.state.currentBatches.push(doc.id);
+      })
+    );
+  };
+
+  addNotification = () => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      message: "Batch name is empty!",
+      level: "warning",
+    });
+  };
 
   state = {
     batchName: null,
@@ -40,15 +69,18 @@ class Batch extends React.Component {
 
     if (this.state.batchName !== null) {
       const batch = db
-        .colletion("users")
+        .collection("users")
         .doc(this.uid)
         .collection("batches")
         .doc(this.state.batchName);
 
-      batch.set({ batchName: this.state.batchName });
+      batch.set({
+        batchName: this.state.batchName,
+        currentBatch: true,
+        archivedBatch: false,
+      });
     } else {
-     
-      );
+      this.addNotification();
     }
   };
 
@@ -79,7 +111,15 @@ class Batch extends React.Component {
         </Col>
 
         <Col sm="2">
-          <Card></Card>
+          <Card>
+            <React.Fragment>
+              <ul>
+                {this.state.currentBatches.map((listItem) => (
+                  <li key={listItem}>{listItem}</li>
+                ))}
+              </ul>
+            </React.Fragment>
+          </Card>
         </Col>
 
         <Col sm="5">
@@ -87,6 +127,7 @@ class Batch extends React.Component {
             <MaterialTable />
           </Card>
         </Col>
+        <NotificationSystem ref={this.notificationSystem} />
       </Row>
     );
   }

@@ -5,6 +5,7 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import LinkIcon from "@material-ui/icons/Link";
 import StoreIcon from "@material-ui/icons/Store";
+import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -112,6 +113,26 @@ class Product extends Component {
         />
         <MaterialTable
           actions={[
+            {
+              icon: LibraryAddIcon,
+              disabled: this.state.singleAction,
+              tooltip: "Add to current batch",
+              onClick: (event, rowData) => {
+                event.preventDefault();
+                const MSKU = rowData.MSKU;
+                const dbMSKU = db
+                  .collection("users")
+                  .doc(uid)
+                  .collection("MSKU")
+                  .doc(MSKU);
+                dbMSKU.get().then((doc) => {
+                  if (doc.exists) {
+                    doc = doc.data();
+                    console.log(doc);
+                  }
+                });
+              },
+            },
             {
               icon: StoreIcon,
               disabled: this.state.singleAction,
@@ -242,7 +263,7 @@ class Product extends Component {
           options={{
             actionsColumnIndex: -1,
             filtering: true,
-            grouping: true,
+            grouping: false,
             exportButton: true,
             search: true,
             selection: this.state.selection,
