@@ -6,6 +6,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 import LinkIcon from "@material-ui/icons/Link";
 import StoreIcon from "@material-ui/icons/Store";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import { Modal } from "react-bootstrap";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -153,13 +154,11 @@ class Product extends Component {
                       .doc(this.state.currentBatch)
                       .collection("Inventory");
 
-                    const { MSKU, ASIN, product_cost, supplier } = doc;
+                    this.render(<Modal></Modal>);
+                    const { MSKU, ASIN, Price, supplier } = doc;
                     batchInventory
                       .doc(doc.MSKU)
-                      .set(
-                        { MSKU, ASIN, product_cost, supplier },
-                        { merge: true }
-                      );
+                      .set({ MSKU, ASIN, Price, supplier }, { merge: true });
                   }
                 });
               },
