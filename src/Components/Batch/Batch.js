@@ -24,26 +24,93 @@ class Batch extends React.Component {
     super(props);
     this.state = {
       batchName: null,
+      currentBatches: null,
+      selectedIndex: null,
+      batchTableData: null,
+      products: {},
     };
     const userData = JSON.parse(sessionStorage.getItem("userData"));
     this.uid = userData.uid;
   }
 
-  componentWillMount = () => {
-    this.getCurrentBatches();
+  //Component Methods
+  componentDidMount = () => {
+    this.getDataFromDB();
+    this.getBatches();
   };
 
-  getCurrentBatches = () => {
+  async getDataFromDB() {
+    var colList = [];
+    var rowList = [];
+
+    let userSet = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("settings")
+      .doc("batchTableHeaders");
+
+    await userSet.get().then((snap) => {
+      colList = snap.data().columns;
+
+      colList.map((column, idx) => {
+        if (column.title === "Image") {
+          colList[idx] = {
+            ...column,
+            render: (rowData) => (
+              <img src={rowData.imageUrl} style={{ width: 75, height: 75 }} />
+            ),
+          };
+        }
+      });
+    });
+
+    //Pulling user inventory data from user database
+    var userInv = db.collection("users").doc(this.uid).collection("batches");
+    const currentBatch = userInv.where("currentBatch", "==", true);
+    currentBatch.get().then((snap) => {
+      snap.forEach((doc) => {
+        userInv = userInv.doc(doc.id).collection("Inventory");
+        //Sort data by ascending
+        userInv.orderBy("asc");
+        //Getting object data
+        userInv
+          .get()
+          .then((snap) => {
+            //Initialize temporary object storage for parsing
+            const items = {};
+            //Loop through each key
+            snap.forEach((item) => {
+              //Restructuring object to meet table format req
+              items[item.id] = item.data();
+              return items;
+            });
+
+            //Looping through previous restructure and pushing to empty array
+            Object.keys(items).forEach((key) => {
+              rowList.push(items[key]);
+            });
+          })
+          .then(() => {
+            //setting state to finished arrays
+            this.setState({ products: { columns: colList, rows: rowList } });
+          });
+      });
+    });
+  }
+
+  getBatches = () => {
     const currentBatches = db
       .collection("users")
       .doc(this.uid)
       .collection("batches");
 
-    currentBatches.onSnapshot((snap) =>
+    currentBatches.onSnapshot((snap) => {
+      let listOfBatches = [];
       snap.forEach((doc) => {
-        this.state.currentBatches.push(doc.id);
-      })
-    );
+        listOfBatches.push(doc.id);
+      });
+      this.setState({ currentBatches: listOfBatches });
+    });
   };
 
   addNotification = () => {
@@ -54,20 +121,28 @@ class Batch extends React.Component {
     });
   };
 
-  state = {
-    batchName: null,
-  };
-
-  updateInput = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    });
-  };
-
   createNewBatch = (e) => {
     e.preventDefault();
 
     if (this.state.batchName !== null) {
+      const otherCurrentBatches = db
+        .collection("users")
+        .doc(this.uid)
+        .collection("batches");
+
+      otherCurrentBatches.get().then((snap) => {
+        snap.forEach((doc) => {
+          if (doc.data().currentBatch === true) {
+            const workingDoc = db
+              .collection("users")
+              .doc(this.uid)
+              .collection("batches")
+              .doc(doc.data().batchName);
+            workingDoc.update({ currentBatch: false });
+          }
+        });
+      });
+
       const batch = db
         .collection("users")
         .doc(this.uid)
@@ -84,7 +159,45 @@ class Batch extends React.Component {
     }
   };
 
+  updateBatchTableData = (batchName) => {
+    const batchData = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+  };
+
+  updateInput = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  handleListItemClick = async (event, index) => {
+    this.setState({ selectedIndex: index });
+    const batchDataCollection = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+
+    await batchDataCollection
+      .where("currentBatch", "==", true)
+      .get()
+      .then((snap) =>
+        snap.forEach((doc) => {
+          batchDataCollection.doc(doc.id).update({ currentBatch: false });
+        })
+      );
+
+    const batchData = batchDataCollection.doc(this.state.currentBatches[index]);
+    await batchData.update({ currentBatch: true });
+    this.getDataFromDB();
+  };
+
   render() {
+    const { products } = this.state;
+
+    const columns = products.columns;
+    const data = products.rows;
     return (
       <Row>
         <Col sm="3" id="createNewBatch">
@@ -113,18 +226,29 @@ class Batch extends React.Component {
         <Col sm="2">
           <Card>
             <React.Fragment>
-              <ul>
-                {this.state.currentBatches.map((listItem) => (
-                  <li key={listItem}>{listItem}</li>
-                ))}
-              </ul>
+              <List>
+                {(this.state.currentBatches || []).map((listItem, index) => {
+                  return (
+                    <ListItem
+                      key={listItem}
+                      button
+                      selected={this.state.selectedIndex === index}
+                      onClick={(event) =>
+                        this.handleListItemClick(event, index)
+                      }
+                    >
+                      {listItem}
+                    </ListItem>
+                  );
+                })}
+              </List>
             </React.Fragment>
           </Card>
         </Col>
 
         <Col sm="5">
           <Card>
-            <MaterialTable />
+            <MaterialTable data={data} columns={columns} />
           </Card>
         </Col>
         <NotificationSystem ref={this.notificationSystem} />

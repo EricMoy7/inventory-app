@@ -14,6 +14,7 @@ class Product extends Component {
     selection: false,
     singleAction: false,
     multiAction: true,
+    currentBatch: null,
   };
 
   actionSwap() {
@@ -117,7 +118,7 @@ class Product extends Component {
               icon: LibraryAddIcon,
               disabled: this.state.singleAction,
               tooltip: "Add to current batch",
-              onClick: (event, rowData) => {
+              onClick: async (event, rowData) => {
                 event.preventDefault();
                 const MSKU = rowData.MSKU;
                 const dbMSKU = db
@@ -125,10 +126,40 @@ class Product extends Component {
                   .doc(uid)
                   .collection("MSKU")
                   .doc(MSKU);
+                const dbBatches = db
+                  .collection("users")
+                  .doc(uid)
+                  .collection("batches");
+                const queryForCurrentBatch = dbBatches.where(
+                  "currentBatch",
+                  "==",
+                  true
+                );
+                await queryForCurrentBatch
+                  .get()
+                  .then((snap) =>
+                    snap.forEach((doc) =>
+                      this.setState({ currentBatch: doc.id })
+                    )
+                  );
+
                 dbMSKU.get().then((doc) => {
                   if (doc.exists) {
                     doc = doc.data();
-                    console.log(doc);
+                    const batchInventory = db
+                      .collection("users")
+                      .doc(uid)
+                      .collection("batches")
+                      .doc(this.state.currentBatch)
+                      .collection("Inventory");
+
+                    const { MSKU, ASIN, product_cost, supplier } = doc;
+                    batchInventory
+                      .doc(doc.MSKU)
+                      .set(
+                        { MSKU, ASIN, product_cost, supplier },
+                        { merge: true }
+                      );
                   }
                 });
               },
@@ -222,7 +253,6 @@ class Product extends Component {
                   .collection("users")
                   .doc(uid)
                   .collection("MSKU");
-                console.log(MSKUS);
                 var query = dbLookup.where("MSKU", "in", MSKUS);
                 query.get().then((Snap) => {
                   Snap.forEach((doc) => {
