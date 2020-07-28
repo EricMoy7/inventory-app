@@ -12,6 +12,10 @@ function App() {
   */
   return (
     <div>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      />
       <Navigation />
     </div>
   );

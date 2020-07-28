@@ -12,11 +12,13 @@ import {
   CardBody,
   CardTitle,
   Button,
+  Modal,
 } from "reactstrap";
 import MaterialTable from "material-table";
 import NotificationSystem from "react-notification-system";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
+import "../Batch/Batch.css";
 
 class Batch extends React.Component {
   notificationSystem = React.createRef();
@@ -28,6 +30,7 @@ class Batch extends React.Component {
       selectedIndex: null,
       batchTableData: null,
       products: {},
+      modal: false,
     };
     const userData = JSON.parse(sessionStorage.getItem("userData"));
     this.uid = userData.uid;
@@ -107,7 +110,7 @@ class Batch extends React.Component {
     currentBatches.onSnapshot((snap) => {
       let listOfBatches = [];
       snap.forEach((doc) => {
-        listOfBatches.push(doc.id);
+        listOfBatches.unshift(doc.id);
       });
       this.setState({ currentBatches: listOfBatches });
     });
@@ -193,6 +196,13 @@ class Batch extends React.Component {
     this.getDataFromDB();
   };
 
+  handleModalShow = () => {
+    this.setState({ Modal: true });
+  };
+  handleModalHide = () => {
+    this.setState({ Modal: false });
+  };
+
   render() {
     const { products } = this.state;
 
@@ -246,11 +256,14 @@ class Batch extends React.Component {
           </Card>
         </Col>
 
-        <Col sm="5">
-          <Card>
-            <MaterialTable data={data} columns={columns} />
-          </Card>
-        </Col>
+        <Card className="table">
+          <MaterialTable
+            className="table"
+            data={data}
+            columns={columns}
+            options={{ exportButton: true }}
+          />
+        </Card>
         <NotificationSystem ref={this.notificationSystem} />
       </Row>
     );

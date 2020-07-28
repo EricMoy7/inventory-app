@@ -6,7 +6,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 import LinkIcon from "@material-ui/icons/Link";
 import StoreIcon from "@material-ui/icons/Store";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
-import { Modal } from "react-bootstrap";
+import { Modal, Form, Button } from "react-bootstrap";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -16,6 +16,9 @@ class Product extends Component {
     singleAction: false,
     multiAction: true,
     currentBatch: null,
+    modal: false,
+    currentSKU: null,
+    quantityValue: 0,
   };
 
   actionSwap() {
@@ -98,6 +101,34 @@ class Product extends Component {
       });
   }
 
+  handleModalShow = () => {
+    this.setState({ modal: true });
+  };
+  handleModalHide = () => {
+    this.setState({ modal: false });
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
+    const uid = userData.uid;
+    const batchUpdateQuantity = db
+      .collection("users")
+      .doc(uid)
+      .collection("batches")
+      .doc(this.state.currentBatch)
+      .collection("Inventory")
+      .doc(this.state.currentSKU);
+    batchUpdateQuantity.set(
+      {
+        quantity: this.state.quantityValue,
+      },
+      { merge: true }
+    );
+  };
+
+  updateInput = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  };
+
   render() {
     const { products } = this.state;
 
@@ -109,10 +140,6 @@ class Product extends Component {
 
     return (
       <div>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        />
         <MaterialTable
           actions={[
             {
@@ -154,11 +181,44 @@ class Product extends Component {
                       .doc(this.state.currentBatch)
                       .collection("Inventory");
 
-                    this.render(<Modal></Modal>);
-                    const { MSKU, ASIN, Price, supplier } = doc;
-                    batchInventory
-                      .doc(doc.MSKU)
-                      .set({ MSKU, ASIN, Price, supplier }, { merge: true });
+                    let today = new Date();
+                    let dd = today.getDate();
+
+                    let mm = today.getMonth() + 1;
+                    const yyyy = today.getFullYear();
+                    if (dd < 10) {
+                      dd = `0${dd}`;
+                    }
+
+                    if (mm < 10) {
+                      mm = `0${mm}`;
+                    }
+                    today = `${mm}/${dd}/${yyyy}`;
+
+                    const {
+                      MSKU,
+                      ASIN,
+                      Price,
+                      supplier,
+                      imageUrl,
+                      product_cost,
+                    } = doc;
+                    batchInventory.doc(doc.MSKU).set(
+                      {
+                        MSKU,
+                        ASIN,
+                        Price,
+                        supplier,
+                        imageUrl,
+                        product_cost,
+                        date: today,
+                        name: doc["Product Name"],
+                        condition: "new",
+                      },
+                      { merge: true }
+                    );
+                    this.setState({ currentSKU: MSKU });
+                    this.handleModalShow();
                   }
                 });
               },
@@ -282,7 +342,19 @@ class Product extends Component {
                 fetch(
                   `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures?uid=${uid}`,
                   { mode: "no-cors" }
-                );
+                )
+                  .then((res) => {
+                    if (res.status !== 200) {
+                      console.log(
+                        "An error has occured while fetching photos. Status Code: " +
+                          res.status +
+                          res
+                      );
+                      return;
+                    }
+                    res.json().then((data) => console.log(data));
+                  })
+                  .catch((err) => console.log("Fetch Error :-S", err));
               },
             },
           ]}
@@ -350,6 +422,33 @@ class Product extends Component {
               }),
           }}
         />
+        <Modal show={this.state.modal} onhide={this.handleModalHide}>
+          <Modal.Header closeButton>
+            <Modal.Title>Product Quantity</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Label>Quantity</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter Quantity"
+                  name="quantityValue"
+                  value={this.state.quantityValue}
+                  onChange={this.updateInput}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleModalHide}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={this.handleModalHide}>
+              Submit
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
