@@ -7,6 +7,7 @@ import LinkIcon from "@material-ui/icons/Link";
 import StoreIcon from "@material-ui/icons/Store";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import { Modal, Form, Button } from "react-bootstrap";
+import Axios from "axios";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -66,7 +67,13 @@ class Product extends Component {
           colList[idx] = {
             ...column,
             render: (rowData) => (
-              <img src={rowData.imageUrl} style={{ width: 75, height: 75 }} />
+              <img
+                src={rowData.imageUrl}
+                style={{
+                  width: rowData.imageWidth,
+                  height: rowData.imageHeight,
+                }}
+              />
             ),
           };
         }
@@ -316,7 +323,6 @@ class Product extends Component {
                 query.get().then((Snap) => {
                   Snap.forEach((doc) => {
                     const productData = doc.data();
-                    //Add if statements for blank
                     window.open(productData.supplier_url, productData.MSKU);
                     console.log("New tab opened");
                   });
@@ -328,9 +334,9 @@ class Product extends Component {
               tooltip: "Update Inventory",
               isFreeAction: true,
               onClick: () => {
-                fetch(
-                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory?uid=${uid}`,
-                  { mode: "no-cors" }
+                Axios.get(
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory`,
+                  { params: { uid } }
                 );
               },
             },
@@ -339,20 +345,20 @@ class Product extends Component {
               tooltip: "Update Photos",
               isFreeAction: true,
               onClick: () => {
-                fetch(
-                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures?uid=${uid}`,
-                  { mode: "no-cors" }
+                Axios.get(
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures`,
+                  { params: { uid } }
                 )
                   .then((res) => {
                     if (res.status !== 200) {
                       console.log(
                         "An error has occured while fetching photos. Status Code: " +
-                          res.status +
-                          res
+                          res.data
                       );
                       return;
+                    } else {
+                      console.log("Report updated");
                     }
-                    res.json().then((data) => console.log(data));
                   })
                   .catch((err) => console.log("Fetch Error :-S", err));
               },
@@ -368,7 +374,7 @@ class Product extends Component {
             exportButton: true,
             search: true,
             selection: this.state.selection,
-            pageSize: 50,
+            pageSize: 100,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
             addRowPosition: "first",
             headerStyle: { position: "sticky", top: 0 },
@@ -386,25 +392,24 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(newData.MSKU)
                     .set(newData);
+                  this.setState({ products: { rows: [...data, newData] } });
                   resolve();
                 }, 1000);
-              }).then(() => {
-                this.getDataFromDB();
               }),
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve, reject) => {
-                setTimeout(async () => {
-                  await db
-                    .collection("users")
+                setTimeout(() => {
+                  db.collection("users")
                     .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
                     .collection("MSKU")
                     .doc(oldData.MSKU)
                     .set(newData);
-
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = newData;
+                  this.setState({ products: { rows: [...dataUpdate] } });
                   resolve();
                 }, 1000);
-              }).then(() => {
-                this.getDataFromDB();
               }),
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
@@ -414,11 +419,12 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(oldData.MSKU)
                     .delete();
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  this.setState({ products: { rows: [...dataDelete] } });
                   resolve();
                 }, 1000);
-              }).then(() => {
-                this.getDataFromDB();
-                this.forceUpdate();
               }),
           }}
         />
