@@ -73,6 +73,7 @@ class Product extends Component {
                   width: rowData.imageWidth,
                   height: rowData.imageHeight,
                 }}
+                alt=""
               />
             ),
           };
