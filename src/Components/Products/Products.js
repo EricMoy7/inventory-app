@@ -337,7 +337,9 @@ class Product extends Component {
               onClick: () => {
                 Axios.get(
                   `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory`,
-                  { params: { uid } }
+                  {
+                    params: { uid },
+                  }
                 );
               },
             },
@@ -348,20 +350,10 @@ class Product extends Component {
               onClick: () => {
                 Axios.get(
                   `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures`,
-                  { params: { uid } }
-                )
-                  .then((res) => {
-                    if (res.status !== 200) {
-                      console.log(
-                        "An error has occured while fetching photos. Status Code: " +
-                          res.data
-                      );
-                      return;
-                    } else {
-                      console.log("Report updated");
-                    }
-                  })
-                  .catch((err) => console.log("Fetch Error :-S", err));
+                  {
+                    params: { uid },
+                  }
+                );
               },
             },
           ]}
@@ -375,11 +367,11 @@ class Product extends Component {
             exportButton: true,
             search: true,
             selection: this.state.selection,
-            pageSize: 100,
+            pageSize: 50,
             pageSizeOptions: [10, 20, 30, 50, 100, 200],
             addRowPosition: "first",
             headerStyle: { position: "sticky", top: 0 },
-            maxBodyHeight: "650px",
+            maxBodyHeight: "800px",
           }}
           editable={{
             onRowUpdateCancelled: (rowData) => {
@@ -393,24 +385,21 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(newData.MSKU)
                     .set(newData);
-                  this.setState({ products: { rows: [...data, newData] } });
                   resolve();
                 }, 1000);
               }),
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  db.collection("users")
-                    .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
-                    .collection("MSKU")
-                    .doc(oldData.MSKU)
-                    .set(newData);
-                  const dataUpdate = [...data];
-                  const index = oldData.tableData.id;
-                  dataUpdate[index] = newData;
-                  this.setState({ products: { rows: [...dataUpdate] } });
-                  resolve();
-                }, 1000);
+                db.collection("users")
+                  .doc(JSON.parse(sessionStorage.getItem("userData")).uid)
+                  .collection("MSKU")
+                  .doc(oldData.MSKU)
+                  .set(newData);
+                const dataUpdate = [...data];
+                const index = oldData.tableData.id;
+                dataUpdate[index] = newData;
+                this.setState({ products: { rows: [...dataUpdate] } });
+                resolve();
               }),
             onRowDelete: (oldData) =>
               new Promise((resolve, reject) => {
@@ -424,6 +413,7 @@ class Product extends Component {
                   const index = oldData.tableData.id;
                   dataDelete.splice(index, 1);
                   this.setState({ products: { rows: [...dataDelete] } });
+                  console.log(dataDelete);
                   resolve();
                 }, 1000);
               }),

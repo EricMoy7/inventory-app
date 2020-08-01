@@ -8,6 +8,7 @@ import Login from "../UserAuth/Login/Login";
 import Logout from "../UserAuth/Logout/Logout";
 import Registration from "../UserAuth/Registration/Registration";
 import Batch from "../Batch/Batch";
+import Settings from "../Settings/Settings";
 
 class Navigation extends React.Component {
   render() {
@@ -27,6 +28,7 @@ class Navigation extends React.Component {
             <Route path="/registration" component={Registration} />
             <Route path="/batch" component={Batch} />
             <Route path="/" component={Home} exact />
+            <Route path="/settings" component={Settings} />
           </Switch>
         </Router>
       </div>

@@ -24,6 +24,7 @@ class ProductForm extends Component {
     product_cost: null,
     supplier: null,
     listMSKU: null,
+    supplier_url: null,
   };
 
   updateInput = (e) => {
@@ -34,7 +35,7 @@ class ProductForm extends Component {
 
   addProduct = (e) => {
     e.preventDefault();
-    let { MSKU, ASIN, product_cost, supplier } = this.state;
+    let { MSKU, ASIN, product_cost, supplier, supplier_url } = this.state;
     const userData = JSON.parse(sessionStorage.getItem("userData"));
 
     let userInventory = db
@@ -49,6 +50,7 @@ class ProductForm extends Component {
         ASIN,
         product_cost,
         supplier,
+        supplier_url,
       },
       { merge: true }
     );
@@ -75,7 +77,14 @@ class ProductForm extends Component {
   };
 
   render() {
-    const { MSKU, ASIN, name, product_cost, supplier } = this.state;
+    const {
+      MSKU,
+      ASIN,
+      name,
+      product_cost,
+      supplier,
+      supplier_url,
+    } = this.state;
 
     return (
       <div>
@@ -136,6 +145,17 @@ class ProductForm extends Component {
                   </InputGroup>
 
                   <br />
+
+                  <InputGroup>
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>Supplier Url</InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      name="supplier_url"
+                      value={supplier_url}
+                      onChange={this.updateInput}
+                    />
+                  </InputGroup>
 
                   <Button className="btn-block" color="primary">
                     Add
