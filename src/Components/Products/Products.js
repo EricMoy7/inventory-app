@@ -385,6 +385,13 @@ class Product extends Component {
                     .collection("MSKU")
                     .doc(newData.MSKU)
                     .set(newData);
+                  const prevColumns = this.state.products.columns;
+                  this.setState({
+                    products: {
+                      rows: [newData, ...data],
+                      columns: prevColumns,
+                    },
+                  });
                   resolve();
                 }, 1000);
               }),
@@ -398,7 +405,10 @@ class Product extends Component {
                 const dataUpdate = [...data];
                 const index = oldData.tableData.id;
                 dataUpdate[index] = newData;
-                this.setState({ products: { rows: [...dataUpdate] } });
+                const prevColumns = this.state.products.columns;
+                this.setState({
+                  products: { rows: [...dataUpdate], columns: prevColumns },
+                });
                 resolve();
               }),
             onRowDelete: (oldData) =>
@@ -412,8 +422,11 @@ class Product extends Component {
                   const dataDelete = [...data];
                   const index = oldData.tableData.id;
                   dataDelete.splice(index, 1);
-                  this.setState({ products: { rows: [...dataDelete] } });
-                  console.log(dataDelete);
+                  const prevColumns = this.state.products.columns;
+                  this.setState({
+                    products: { rows: [...dataDelete], columns: prevColumns },
+                  });
+                  console.log(this.state);
                   resolve();
                 }, 1000);
               }),

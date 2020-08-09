@@ -27,6 +27,7 @@ class Batch extends React.Component {
     this.state = {
       batchName: null,
       currentBatches: null,
+      currentBatch: null,
       selectedIndex: null,
       batchTableData: null,
       products: {},
@@ -34,6 +35,9 @@ class Batch extends React.Component {
     };
     const userData = JSON.parse(sessionStorage.getItem("userData"));
     this.uid = userData.uid;
+    this.deleteBatch = this.deleteBatch.bind(this);
+    this.archiveBatch = this.archiveBatch.bind(this);
+    this.updateOnHand = this.updateOnHand.bind(this);
   }
 
   //Component Methods
@@ -110,7 +114,12 @@ class Batch extends React.Component {
     currentBatches.onSnapshot((snap) => {
       let listOfBatches = [];
       snap.forEach((doc) => {
-        listOfBatches.unshift(doc.id);
+        if (doc.data().archivedBatch !== true) {
+          listOfBatches.unshift(doc.id);
+          if (doc.data().currentBatch === true) {
+            this.setState({ currentBatch: doc.id });
+          }
+        }
       });
       this.setState({ currentBatches: listOfBatches });
     });
@@ -159,6 +168,74 @@ class Batch extends React.Component {
       });
     } else {
       this.addNotification();
+    }
+  };
+
+  deleteBatch = () => {
+    const currentBatchDB = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+
+    const { currentBatches, currentBatch } = this.state;
+    try {
+      const idCurrentBatch = currentBatches.indexOf(this.state.currentBatch);
+      currentBatches.splice(idCurrentBatch, 1);
+      this.setState({ currentBatches });
+
+      currentBatchDB.doc(currentBatch).delete();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  archiveBatch = () => {
+    const currentBatchDB = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+    const { currentBatches, currentBatch } = this.state;
+
+    const idCurrentBatch = currentBatches.indexOf(this.state.currentBatch);
+    currentBatches.splice(idCurrentBatch, 1);
+    this.setState({ currentBatches });
+
+    currentBatchDB.doc(currentBatch).set({ archivedBatch: true });
+  };
+
+  updateOnHand = async () => {
+    const currentBatches = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("batches");
+    const currentInventory = db
+      .collection("users")
+      .doc(this.uid)
+      .collection("MSKU");
+
+    const inventory = await currentInventory.get();
+    for (const product of inventory.docs) {
+      currentInventory
+        .doc(product.id)
+        .set({ onHandUnits: "0" }, { merge: true });
+    }
+
+    for (const batch of this.state.currentBatches) {
+      let batchData = await currentBatches.doc(batch).get();
+      batchData = batchData.data();
+      if (batchData.archivedBatch !== true) {
+        let batchInventory = await currentBatches
+          .doc(batch)
+          .collection("Inventory")
+          .get();
+        for (const product of batchInventory.docs) {
+          const productId = product.id;
+          const quantity = product.data().quantity;
+          currentInventory
+            .doc(productId)
+            .set({ onHandUnits: quantity }, { merge: true });
+        }
+      }
     }
   };
 
@@ -254,6 +331,13 @@ class Batch extends React.Component {
               </List>
             </React.Fragment>
           </Card>
+        </Col>
+
+        <Col sm="1">
+          <Button onClick={this.archiveBatch}>Archive Batch</Button>
+          <Button onClick={this.deleteBatch}>Delete Batch</Button>
+          <Button>Rename Batch</Button>
+          <Button onClick={this.updateOnHand}>Update Batch Amounts</Button>
         </Col>
 
         <Card className="table">
