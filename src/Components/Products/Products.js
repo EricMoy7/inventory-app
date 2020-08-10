@@ -67,15 +67,36 @@ class Product extends Component {
           colList[idx] = {
             ...column,
             render: (rowData) => (
-              <img
-                src={rowData.imageUrl}
-                style={{
-                  width: rowData.imageWidth,
-                  height: rowData.imageHeight,
-                }}
-                alt=""
-              />
+              <a
+                href={`https://www.amazon.com/dp/${rowData.ASIN}`}
+                target="_blank"
+              >
+                <img
+                  src={rowData.imageUrl}
+                  style={{
+                    width: rowData.imageWidth,
+                    height: rowData.imageHeight,
+                  }}
+                  alt={rowData["Product Name"]}
+                />
+              </a>
             ),
+          };
+        }
+
+        if (column.title === "Availible Units") {
+          colList[idx] = {
+            ...column,
+            render: (rowData) =>
+              rowData["Availible Units"] === "0" ? (
+                <tr style={{ color: "red", position: "relative" }}>
+                  {rowData["Availible Units"]}
+                </tr>
+              ) : (
+                <tr style={{ color: "black", position: "relative" }}>
+                  {rowData["Availible Units"]}
+                </tr>
+              ),
           };
         }
       });
@@ -238,16 +259,6 @@ class Product extends Component {
               onClick: (event, rowData) => {
                 const url = rowData.supplier_url;
                 window.open(url, rowData.MSKU);
-              },
-            },
-            {
-              icon: LinkIcon,
-              disabled: this.state.singleAction,
-              tooltip: "Go to Amazon Page",
-              onClick: (event, rowData) => {
-                const asin = rowData.ASIN;
-                const amazonUrl = `https://www.amazon.com/dp/${asin}`;
-                window.open(amazonUrl, asin);
               },
             },
             {
