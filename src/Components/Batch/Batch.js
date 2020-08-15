@@ -231,6 +231,7 @@ class Batch extends React.Component {
         for (const product of batchInventory.docs) {
           const productId = product.id;
           const quantity = product.data().quantity;
+          console.log(quantity);
           currentInventory
             .doc(productId)
             .set({ onHandUnits: quantity }, { merge: true });

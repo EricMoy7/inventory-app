@@ -174,7 +174,7 @@ class ProductForm extends Component {
                       <InputGroupText>List Price</InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      name="price"
+                      name="Price"
                       value={price}
                       onChange={this.updateInput}
                     />
