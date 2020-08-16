@@ -223,7 +223,7 @@ class Batch extends React.Component {
     for (const batch of this.state.currentBatches) {
       let batchData = await currentBatches.doc(batch).get();
       batchData = batchData.data();
-      if (batchData.archivedBatch !== true) {
+      if (batchData.archivedBatch === false) {
         let batchInventory = await currentBatches
           .doc(batch)
           .collection("Inventory")
@@ -231,7 +231,7 @@ class Batch extends React.Component {
         for (const product of batchInventory.docs) {
           const productId = product.id;
           const quantity = product.data().quantity;
-          console.log(quantity);
+          console.log({ productId, quantity });
           currentInventory
             .doc(productId)
             .set({ onHandUnits: quantity }, { merge: true });

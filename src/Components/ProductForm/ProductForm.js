@@ -25,7 +25,7 @@ class ProductForm extends Component {
     supplier: null,
     listMSKU: null,
     supplier_url: null,
-    price: null,
+    Price: null,
   };
 
   updateInput = (e) => {
@@ -42,7 +42,7 @@ class ProductForm extends Component {
       product_cost,
       supplier,
       supplier_url,
-      price,
+      Price,
     } = this.state;
     const userData = JSON.parse(sessionStorage.getItem("userData"));
 
@@ -59,7 +59,7 @@ class ProductForm extends Component {
         product_cost,
         supplier,
         supplier_url,
-        price,
+        Price,
       },
       { merge: true }
     );
@@ -93,7 +93,7 @@ class ProductForm extends Component {
       product_cost,
       supplier,
       supplier_url,
-      price,
+      Price,
     } = this.state;
 
     return (
@@ -175,7 +175,7 @@ class ProductForm extends Component {
                     </InputGroupAddon>
                     <Input
                       name="Price"
-                      value={price}
+                      value={Price}
                       onChange={this.updateInput}
                     />
                   </InputGroup>
