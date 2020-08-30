@@ -200,7 +200,9 @@ class Batch extends React.Component {
     currentBatches.splice(idCurrentBatch, 1);
     this.setState({ currentBatches });
 
-    currentBatchDB.doc(currentBatch).set({ archivedBatch: true });
+    currentBatchDB
+      .doc(currentBatch)
+      .set({ archivedBatch: true }, { merge: true });
   };
 
   updateOnHand = async () => {
