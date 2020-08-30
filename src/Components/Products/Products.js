@@ -347,7 +347,7 @@ class Product extends Component {
               isFreeAction: true,
               onClick: () => {
                 Axios.get(
-                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventory`,
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updateInventoryRequest`,
                   {
                     params: { uid },
                   }
@@ -360,7 +360,7 @@ class Product extends Component {
               isFreeAction: true,
               onClick: () => {
                 Axios.get(
-                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePictures`,
+                  `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/updatePicturesRequest`,
                   {
                     params: { uid },
                   }
