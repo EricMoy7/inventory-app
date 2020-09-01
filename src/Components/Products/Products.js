@@ -88,7 +88,7 @@ class Product extends Component {
           colList[idx] = {
             ...column,
             render: (rowData) =>
-              rowData["Availible Units"] === "0" ? (
+              rowData["Availible Units"] === 0 ? (
                 <tr style={{ color: "red", position: "relative" }}>
                   {rowData["Availible Units"]}
                 </tr>
@@ -383,6 +383,21 @@ class Product extends Component {
             addRowPosition: "first",
             headerStyle: { position: "sticky", top: 0 },
             maxBodyHeight: "800px",
+            headerStyle: {
+              backgroundColor: "#000000",
+              color: "#FFF",
+              fontSize: 14,
+              fontFamily: "Roboto",
+              fontStyle: "normal",
+              fontWeight: 500,
+            },
+            rowStyle: {
+              backgroundColor: "#EEE",
+              fontSize: 14,
+              fontFamily: "Roboto",
+              fontStyle: "normal",
+              fontWeight: 100,
+            },
           }}
           editable={{
             onRowUpdateCancelled: (rowData) => {
