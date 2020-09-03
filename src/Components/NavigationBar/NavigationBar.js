@@ -45,6 +45,10 @@ class NavigationBar extends React.Component {
               <NavItem>
                 <NavLink href="/workers">Workers</NavLink>
               </NavItem>
+
+              <NavItem>
+                <NavLink href="/settings">Settings</NavLink>
+              </NavItem>
             </Nav>
             <Nav>
               <NavItem>

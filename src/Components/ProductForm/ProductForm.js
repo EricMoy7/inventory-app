@@ -89,7 +89,6 @@ class ProductForm extends Component {
     const {
       MSKU,
       ASIN,
-      name,
       product_cost,
       supplier,
       supplier_url,
