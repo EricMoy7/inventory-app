@@ -162,6 +162,7 @@ class Workers extends React.Component {
                           .set({ isCurrent: true }, { merge: true });
 
                         this.setState({ currentWorker: eventKey });
+                        this.getDataFromDB();
                       }}
                     >
                       {listItem.workerName}
