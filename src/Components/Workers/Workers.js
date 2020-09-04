@@ -20,15 +20,13 @@ class Workers extends React.Component {
       currentWorker: null,
       workerData: null,
       products: {},
-      newProduct: {
-        MSKU: null,
-        ASIN: null,
-        product_cost: null,
-        supplier: null,
-        listMSKU: null,
-        supplier_url: null,
-        Price: null,
-      },
+      MSKU: null,
+      ASIN: null,
+      product_cost: null,
+      supplier: null,
+      listMSKU: null,
+      supplier_url: null,
+      Price: null,
     };
     this.userData = JSON.parse(sessionStorage.getItem("userData"));
     this.uid = this.userData.uid;
@@ -109,9 +107,23 @@ class Workers extends React.Component {
 
   updateInput = (e) => {
     this.setState({
-      newProduct: { ...this.state.newProduct, [e.target.name]: e.target.value },
+      [e.target.name]: e.target.value,
     });
-    console.log(this.state.newProduct);
+    console.log(this.state);
+  };
+
+  addProduct = () => {
+    Axios.get(
+      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/workerAddProductRequest?` +
+        `uid=${this.uid}&` +
+        `workerName=${this.state.currentWorker}&` +
+        `ASIN=${this.state.ASIN}&` +
+        `MSKU=${this.state.MSKU}&` +
+        `product_cost=${this.state.product_cost}&` +
+        `supplier=${this.state.supplier}&` +
+        `supplier_url=${this.state.supplier_url}&` +
+        `Price=${this.state.Price}`
+    );
   };
 
   render() {
@@ -160,53 +172,61 @@ class Workers extends React.Component {
             </Dropdown>
           </Row>
 
-          <Form.Row className="">
-            <Col>
-              <Form.Control
-                placeholder="MSKU"
-                onChange={this.updateInput}
-                value={MSKU}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                placeholder="ASIN"
-                onChange={this.updateInput}
-                value={ASIN}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                placeholder="Product Cost"
-                onChange={this.updateInput}
-                value={product_cost}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                placeholder="Supplier"
-                onChange={this.updateInput}
-                value={supplier}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                placeholder="Supplier URL"
-                onChange={this.updateInput}
-                value={supplier_url}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                placeholder="List Price"
-                onChange={this.updateInput}
-                value={Price}
-              />
-            </Col>
-            <Col sm="1">
-              <Button>Submit </Button>
-            </Col>
-          </Form.Row>
+          <Form onSubmit={this.addProduct}>
+            <Form.Row className="">
+              <Col>
+                <Form.Control
+                  placeholder="MSKU"
+                  onChange={this.updateInput}
+                  value={MSKU || ""}
+                  name="MSKU"
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  placeholder="ASIN"
+                  onChange={this.updateInput}
+                  value={ASIN || ""}
+                  name="ASIN"
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  placeholder="Product Cost"
+                  onChange={this.updateInput}
+                  value={product_cost || ""}
+                  name="product_cost"
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  placeholder="Supplier"
+                  onChange={this.updateInput}
+                  value={supplier || ""}
+                  name="supplier"
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  placeholder="Supplier URL"
+                  onChange={this.updateInput}
+                  value={supplier_url || ""}
+                  name="supplier_url"
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  placeholder="List Price"
+                  onChange={this.updateInput}
+                  value={Price || ""}
+                  name="Price"
+                />
+              </Col>
+              <Col sm="1">
+                <Button type="submit">Submit </Button>
+              </Col>
+            </Form.Row>
+          </Form>
         </Container>
 
         <Container fluid className="body-float">
