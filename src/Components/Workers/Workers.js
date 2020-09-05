@@ -9,9 +9,12 @@ import {
   Container,
   Form,
   Button,
+  Spinner,
 } from "react-bootstrap";
 import "./Worker.css";
+import ProductCRUD from "../Utils";
 import MaterialTable from "material-table";
+import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 
 class Workers extends React.Component {
   constructor(props) {
@@ -20,6 +23,7 @@ class Workers extends React.Component {
       currentWorker: null,
       workerData: null,
       products: {},
+      loading: false,
       MSKU: null,
       ASIN: null,
       product_cost: null,
@@ -49,6 +53,7 @@ class Workers extends React.Component {
     }
 
     await this.getDataFromDB();
+    this.setState({ loading: true });
   }
 
   async getDataFromDB() {
@@ -109,21 +114,41 @@ class Workers extends React.Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
-    console.log(this.state);
   };
 
-  addProduct = () => {
-    Axios.get(
-      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/workerAddProductRequest?` +
-        `uid=${this.uid}&` +
-        `workerName=${this.state.currentWorker}&` +
-        `ASIN=${this.state.ASIN}&` +
-        `MSKU=${this.state.MSKU}&` +
-        `product_cost=${this.state.product_cost}&` +
-        `supplier=${this.state.supplier}&` +
-        `supplier_url=${this.state.supplier_url}&` +
-        `Price=${this.state.Price}`
+  addProduct = async (e) => {
+    e.preventDefault();
+    const {
+      MSKU,
+      ASIN,
+      product_cost,
+      supplier,
+      supplier_url,
+      Price,
+    } = this.state;
+    const data = {
+      MSKU,
+      ASIN,
+      product_cost,
+      supplier,
+      supplier_url,
+      Price,
+    };
+    const productCRUD = new ProductCRUD(
+      "create",
+      "worker",
+      data,
+      this.uid,
+      this.state.currentWorker,
+      MSKU
     );
+
+    productCRUD.init();
+    const prevColumns = this.state.products.columns;
+    const prevRows = this.state.products.rows;
+    this.setState({
+      products: { rows: [data, ...prevRows], columns: prevColumns },
+    });
   };
 
   render() {
@@ -134,9 +159,22 @@ class Workers extends React.Component {
       supplier,
       supplier_url,
       Price,
+      products,
     } = this.state;
+
+    const columns = products.columns;
+    const data = products.rows;
     return (
       <Container className="" fluid>
+        <Container className="spinner-background">
+          <Spinner
+            hidden={this.state.loading}
+            animation="border"
+            variant="primary"
+            className="spinner"
+          />
+        </Container>
+
         <Container className="header-float" fluid>
           <Row id="workerSelector" className=" centering">
             <Dropdown>
@@ -236,6 +274,111 @@ class Workers extends React.Component {
             title={`${this.state.currentWorker}'s Finds`}
             columns={this.state.products.columns}
             data={this.state.products.rows}
+            options={{ actionsColumnIndex: -1 }}
+            actions={[
+              {
+                icon: LibraryAddIcon,
+                tooltip: "Add to main Inventory",
+                onClick: async (event, rowData) => {
+                  event.preventDefault();
+                  let add = new ProductCRUD(
+                    "create",
+                    "main",
+                    rowData,
+                    this.uid,
+                    this.state.currentWorker,
+                    rowData.MSKU
+                  );
+
+                  let remove = new ProductCRUD(
+                    "delete",
+                    "worker",
+                    rowData,
+                    this.uid,
+                    this.state.currentWorker,
+                    rowData.MSKU
+                  );
+
+                  add.init();
+                  remove.init();
+                },
+              },
+            ]}
+            editable={{
+              onRowAddCancelled: (rowData) =>
+                console.log("Row adding cancelled"),
+              onRowUpdateCancelled: (rowData) =>
+                console.log("Row editing cancelled"),
+              onRowAdd: (newData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    let productCRUD = new ProductCRUD(
+                      "create",
+                      "worker",
+                      newData,
+                      this.uid,
+                      this.state.currentWorker,
+                      newData.MSKU
+                    );
+                    productCRUD.init();
+
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: {
+                        rows: [newData, ...data],
+                        columns: prevColumns,
+                      },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    let productCRUD = new ProductCRUD(
+                      "update",
+                      "worker",
+                      newData,
+                      this.uid,
+                      this.state.currentWorker,
+                      newData.MSKU
+                    );
+                    productCRUD.init();
+
+                    const dataUpdate = [...data];
+                    const index = oldData.tableData.id;
+                    dataUpdate[index] = newData;
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: { rows: [...dataUpdate], columns: prevColumns },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+              onRowDelete: (oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    let productCRUD = new ProductCRUD(
+                      "delete",
+                      "worker",
+                      oldData,
+                      this.uid,
+                      this.state.currentWorker,
+                      oldData.MSKU
+                    );
+                    productCRUD.init();
+
+                    const dataDelete = [...data];
+                    const index = oldData.tableData.id;
+                    dataDelete.splice(index, 1);
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: { rows: [...dataDelete], columns: prevColumns },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+            }}
           />
         </Container>
       </Container>

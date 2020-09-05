@@ -31,7 +31,6 @@ class Product extends Component {
     } else {
       console.log("Error has occured in function actionSwap()");
     }
-    console.log(this.state.multiAction);
     this.forceUpdate();
   }
   //On load function
@@ -452,7 +451,6 @@ class Product extends Component {
                   this.setState({
                     products: { rows: [...dataDelete], columns: prevColumns },
                   });
-                  console.log(this.state);
                   resolve();
                 }, 1000);
               }),

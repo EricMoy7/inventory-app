@@ -31,6 +31,14 @@
   display: table;
 }
 
+.spinner {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  margin: 0px auto;
+  z-index: 4;
+}
+
 #workerSelector {
   margin-bottom: 10px;
 }
