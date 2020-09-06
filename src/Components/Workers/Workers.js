@@ -301,6 +301,22 @@ class Workers extends React.Component {
 
                   add.init();
                   remove.init();
+
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      const dataDelete = [...data];
+                      const index = rowData.tableData.id;
+                      dataDelete.splice(index, 1);
+                      const prevColumns = this.state.products.columns;
+                      this.setState({
+                        products: {
+                          rows: [...dataDelete],
+                          columns: prevColumns,
+                        },
+                      });
+                      resolve();
+                    }, 1000);
+                  });
                 },
               },
             ]}
