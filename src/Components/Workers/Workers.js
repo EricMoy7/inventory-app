@@ -15,6 +15,19 @@ import "./Worker.css";
 import ProductCRUD from "../Utils";
 import MaterialTable from "material-table";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+function Notify() {
+  const notify = () => toast("Wow so easy !");
+
+  return (
+    <div>
+      <button onClick={notify}>Notify !</button>
+      <ToastContainer />
+    </div>
+  );
+}
 
 class Workers extends React.Component {
   constructor(props) {
@@ -155,6 +168,8 @@ class Workers extends React.Component {
       supplier_url: null,
       Price: null,
     });
+
+    toast("Sucess");
   };
 
   render() {
@@ -172,6 +187,7 @@ class Workers extends React.Component {
     const data = products.rows;
     return (
       <Container className="" fluid>
+        <ToastContainer />
         <Container className="spinner-background">
           <Spinner
             hidden={this.state.loading}
