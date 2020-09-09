@@ -19,6 +19,7 @@ import NotificationSystem from "react-notification-system";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import "../Batch/Batch.css";
+import ProductCRUD from "../Utils";
 
 class Batch extends React.Component {
   notificationSystem = React.createRef();
@@ -242,13 +243,6 @@ class Batch extends React.Component {
     }
   };
 
-  updateBatchTableData = (batchName) => {
-    const batchData = db
-      .collection("users")
-      .doc(this.uid)
-      .collection("batches");
-  };
-
   updateInput = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
@@ -349,6 +343,85 @@ class Batch extends React.Component {
             data={data}
             columns={columns}
             options={{ exportButton: true }}
+            editable={{
+              onRowAddCancelled: (rowData) =>
+                console.log("Row adding cancelled"),
+              onRowUpdateCancelled: (rowData) =>
+                console.log("Row editing cancelled"),
+              onRowAdd: (newData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    let productCRUD = new ProductCRUD(
+                      "create",
+                      "batch",
+                      newData,
+                      this.uid,
+                      null,
+                      newData.MSKU,
+                      this.state.currentBatch
+                    );
+                    productCRUD.init();
+
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: {
+                        rows: [newData, ...data],
+                        columns: prevColumns,
+                      },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    let productCRUD = new ProductCRUD(
+                      "update",
+                      "batch",
+                      newData,
+                      this.uid,
+                      null,
+                      newData.MSKU,
+                      this.state.currentBatch
+                    );
+                    productCRUD.init();
+
+                    const dataUpdate = [...data];
+                    const index = oldData.tableData.id;
+                    dataUpdate[index] = newData;
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: { rows: [...dataUpdate], columns: prevColumns },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+              onRowDelete: (oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    console.log(this.state.currentBatch);
+                    let productCRUD = new ProductCRUD(
+                      "delete",
+                      "batch",
+                      oldData,
+                      this.uid,
+                      null,
+                      oldData.MSKU,
+                      this.state.currentBatch
+                    );
+                    productCRUD.init();
+
+                    const dataDelete = [...data];
+                    const index = oldData.tableData.id;
+                    dataDelete.splice(index, 1);
+                    const prevColumns = this.state.products.columns;
+                    this.setState({
+                      products: { rows: [...dataDelete], columns: prevColumns },
+                    });
+                    resolve();
+                  }, 1000);
+                }),
+            }}
           />
         </Card>
         <NotificationSystem ref={this.notificationSystem} />
