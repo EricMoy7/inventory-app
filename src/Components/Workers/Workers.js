@@ -148,6 +148,12 @@ class Workers extends React.Component {
     const prevRows = this.state.products.rows;
     this.setState({
       products: { rows: [data, ...prevRows], columns: prevColumns },
+      MSKU: null,
+      ASIN: null,
+      product_cost: null,
+      supplier: null,
+      supplier_url: null,
+      Price: null,
     });
   };
 
