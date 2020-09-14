@@ -342,7 +342,7 @@ class Batch extends React.Component {
             className="table"
             data={data}
             columns={columns}
-            options={{ exportButton: true }}
+            options={{ exportButton: true, exportAllData: true }}
             editable={{
               onRowAddCancelled: (rowData) =>
                 console.log("Row adding cancelled"),

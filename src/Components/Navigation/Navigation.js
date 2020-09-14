@@ -10,6 +10,7 @@ import Registration from "../UserAuth/Registration/Registration";
 import Batch from "../Batch/Batch";
 import Settings from "../Settings/Settings";
 import Workers from "../Workers/Workers";
+import Selector from "../Shipment/Selector";
 
 class Navigation extends React.Component {
   render() {
@@ -31,6 +32,7 @@ class Navigation extends React.Component {
             <Route path="/" component={Home} exact />
             <Route path="/settings" component={Settings} />
             <Route path="/workers" component={Workers} />
+            <Route path="/shipment" component={Selector} />
           </Switch>
         </Router>
       </div>
