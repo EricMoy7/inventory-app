@@ -11,6 +11,7 @@ class Home extends React.Component {
 
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
+      console.log(user);
       if (user) {
         this.setState({ user });
       }
@@ -20,7 +21,7 @@ class Home extends React.Component {
     return this.state.user ? (
       <h1>Welcome to Stealth LLC Inventory Management</h1>
     ) : (
-      (window.location.href = "registration")
+      <h1>You are not logged in</h1>
     );
   }
 }

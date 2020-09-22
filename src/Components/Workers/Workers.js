@@ -1,6 +1,7 @@
 import React from "react";
 import { db } from "../Firebase";
 import Axios from "axios";
+import StoreIcon from "@material-ui/icons/Store";
 import {
   Dropdown,
   Col,
@@ -92,7 +93,19 @@ class Workers extends React.Component {
           colList[idx] = {
             ...column,
             render: (rowData) => (
-              <img src={rowData.imageUrl} style={{ width: 75, height: 75 }} />
+              <a
+                href={`https://www.amazon.com/dp/${rowData.ASIN}`}
+                target="_blank"
+              >
+                <img
+                  src={rowData.imageUrl}
+                  style={{
+                    width: rowData.imageWidth,
+                    height: rowData.imageHeight,
+                  }}
+                  alt={rowData["Product Name"]}
+                />
+              </a>
             ),
           };
         }
@@ -339,6 +352,15 @@ class Workers extends React.Component {
                       resolve();
                     }, 1000);
                   });
+                },
+              },
+              {
+                icon: StoreIcon,
+                disabled: this.state.singleAction,
+                tooltip: "Go to supplier website",
+                onClick: (event, rowData) => {
+                  const url = rowData.supplier_url;
+                  window.open(url, rowData.MSKU);
                 },
               },
             ]}

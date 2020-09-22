@@ -8,6 +8,7 @@ import StoreIcon from "@material-ui/icons/Store";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import { Modal, Form, Button } from "react-bootstrap";
 import Axios from "axios";
+import Container from "@material-ui/core/Container";
 
 class Product extends Component {
   //Initialize empty object to store product data
@@ -40,25 +41,17 @@ class Product extends Component {
   }
 
   async getDataFromDB() {
-    //Pulling user data from session storage
-    //userData is stored as soon as the user logins check firebase.js
     const userData = JSON.parse(sessionStorage.getItem("userData"));
     const uid = userData.uid;
-
-    //Initializing empty array for column headers and row data
     var colList = [];
     var rowList = [];
 
-    //Pulling settings data from user database
-    //TODO: Create settings for user provided headers
     let userSet = db
       .collection("users")
       .doc(uid)
       .collection("settings")
       .doc("tableHeaders");
-    //Getting user column headers
     await userSet.get().then((snap) => {
-      //Saving column headers to previous empty array
       colList = snap.data().columns;
 
       colList.map((column, idx) => {
@@ -101,30 +94,21 @@ class Product extends Component {
       });
     });
 
-    //Pulling user inventory data from user database
     let userInv = db.collection("users").doc(uid).collection("MSKU");
-    //Sort data by ascending
     userInv.orderBy("asc");
-    //Getting object data
     await userInv
       .get()
       .then((snap) => {
-        //Initialize temporary object storage for parsing
         const items = {};
-        //Loop through each key
         snap.forEach((item) => {
-          //Restructuring object to meet table format req
           items[item.id] = item.data();
           return items;
         });
-
-        //Looping through previous restructure and pushing to empty array
         Object.keys(items).forEach((key) => {
           rowList.push(items[key]);
         });
       })
       .then(() => {
-        //setting state to finished arrays
         this.setState({ products: { columns: colList, rows: rowList } });
       });
   }
@@ -167,7 +151,7 @@ class Product extends Component {
     const uid = userData.uid;
 
     return (
-      <div>
+      <Container fluid maxWidth="false">
         <MaterialTable
           actions={[
             {
@@ -383,15 +367,15 @@ class Product extends Component {
             headerStyle: { position: "sticky", top: 0 },
             maxBodyHeight: "800px",
             headerStyle: {
-              backgroundColor: "#000000",
-              color: "#FFF",
-              fontSize: 14,
+              backgroundColor: "white",
+              color: "black",
+              fontSize: 12,
               fontFamily: "Roboto",
               fontStyle: "normal",
-              fontWeight: 500,
+              fontWeight: 800,
             },
             rowStyle: {
-              backgroundColor: "#EEE",
+              backgroundColor: "white",
               fontSize: 14,
               fontFamily: "Roboto",
               fontStyle: "normal",
@@ -483,7 +467,7 @@ class Product extends Component {
             </Button>
           </Modal.Footer>
         </Modal>
-      </div>
+      </Container>
     );
   }
 }
