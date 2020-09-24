@@ -1,3 +1,5 @@
+import React from "react";
+
 export function renderTableStyle(colList) {
   colList.map((column, idx) => {
     if (column.title === "Image") {

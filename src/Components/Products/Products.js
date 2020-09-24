@@ -4,6 +4,7 @@ import Axios from "axios";
 import MaterialTable from "material-table";
 import Container from "@material-ui/core/Container";
 import { renderTableStyle } from "./Utilities/RenderingStyles";
+import ProductCRUD from "../Utils";
 
 const uid = JSON.parse(sessionStorage.getItem("userData")).uid;
 const inventory = db.collection(`users/${uid}/MSKU`);
@@ -32,7 +33,46 @@ const Product = () => {
 
   return (
     <Container>
-      <MaterialTable columns={columns} data={rows} editable={true} />
+      <MaterialTable
+        columns={columns}
+        data={rows}
+        editable={{
+          onBulkUpdate: (changes) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                /* setData([...data, newData]); */
+
+                resolve();
+              }, 1000);
+            }),
+          onRowAddCancelled: (rowData) => console.log("Row adding cancelled"),
+          onRowUpdateCancelled: (rowData) =>
+            console.log("Row editing cancelled"),
+          onRowAdd: (newData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`users/${uid}/MSKU/${newData.MSKU}`).set(newData);
+                resolve();
+              }, 1000);
+            }),
+          onRowUpdate: (newData, oldData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`users/${uid}/MSKU/${oldData.MSKU}`).update(newData);
+
+                resolve();
+              }, 1000);
+            }),
+          onRowDelete: (oldData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`users/${uid}/MSKU/${oldData.MSKU}`).delete();
+
+                resolve();
+              }, 1000);
+            }),
+        }}
+      />
     </Container>
   );
 };
