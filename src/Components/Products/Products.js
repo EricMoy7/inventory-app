@@ -7,7 +7,7 @@ import { renderTableStyle } from "./Utilities/RenderingStyles";
 import ProductCRUD from "../Utils";
 
 const uid = JSON.parse(sessionStorage.getItem("userData")).uid;
-const inventory = db.collection(`users/${uid}/MSKU`);
+const inventory = db.doc(`users/${uid}/snapshots/inventorySnapshot`);
 const headers = db.doc(`users/${uid}/settings/tableHeaders`);
 
 const Product = () => {
@@ -25,7 +25,8 @@ const Product = () => {
 
   useEffect(() => {
     const unsubscribe = inventory.onSnapshot((snapshot) => {
-      const data = snapshot.docs.map((doc) => doc.data());
+      const data = Object.entries(snapshot.data().products);
+      console.log(data);
       setRows(data);
     });
     return () => unsubscribe();
