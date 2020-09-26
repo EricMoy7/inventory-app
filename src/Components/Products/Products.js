@@ -25,12 +25,11 @@ const Product = () => {
 
   useEffect(() => {
     const unsubscribe = inventory.onSnapshot((snapshot) => {
-      const data = Object.entries(snapshot.data().products);
-      console.log(data);
-      setRows(data);
+      const values = Object.values(snapshot.data().products);
+      setRows(values);
     });
     return () => unsubscribe();
-  });
+  }, []);
 
   return (
     <Container>
