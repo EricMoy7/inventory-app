@@ -1,5 +1,5 @@
 import React from "react";
-import Products from "../Components/Products/Products";
+import Products from "../Components/Tables/Products/Products";
 
 function Inventory() {
   const uid = JSON.parse(sessionStorage.getItem("userData")).uid;

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../Firebase";
+import { db } from "../../Firebase";
 import Axios from "axios";
 import MaterialTable from "material-table";
-import { Popover, Container } from "@material-ui/core";
+import { Container } from "@material-ui/core";
 import { renderTableStyle } from "./Utilities/RenderingStyles";
-import ProductCRUD from "../Utils";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import StoreIcon from "@material-ui/icons/Store";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -59,37 +57,6 @@ const Product = (props) => {
   function getHeaderData(headers) {
     const unsubscribe = headers.onSnapshot((snapshot) => {
       let colList = snapshot.data().columns;
-
-      colList.map((column, idx) => {
-        if (column.title === "Image") {
-          colList[idx] = {
-            ...column,
-            render: (rowData) => (
-              <a
-                href={`https://www.amazon.com/dp/${rowData.ASIN}`}
-                target="_blank"
-              >
-                <img
-                  src={rowData.imageUrl}
-                  style={{
-                    width: rowData.imageWidth,
-                    height: rowData.imageHeight,
-                  }}
-                  alt={rowData["Product Name"]}
-                />
-              </a>
-            ),
-          };
-        }
-        if (column.title === "Product Name") {
-          colList[idx] = {
-            ...column,
-            render: (rowData) => (
-              <td>{rowData["Product Name"].substring(0, 50)}</td>
-            ),
-          };
-        }
-      });
 
       setColumns(renderTableStyle(colList));
     });

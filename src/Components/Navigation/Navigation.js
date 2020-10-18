@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import ProductForm from "../ProductForm/ProductForm";
 import Home from "../Home/Home";
-import Products from "../Products/Products";
+import Products from "../Tables/Products/Products";
 import Login from "../UserAuth/Login/Login";
 import Logout from "../UserAuth/Logout/Logout";
 import Registration from "../UserAuth/Registration/Registration";
-import Batch from "../Batch/Batch";
 import Settings from "../Settings/Settings";
 import Workers from "../Workers/Workers";
 import Selector from "../Shipment/Selector";
@@ -161,7 +160,7 @@ export default function PersistentDrawerLeft() {
             </div>
             <Divider />
             <List>
-              {["Home", "Inventory", "Batches", "Logout"].map((text, index) => (
+              {["Home", "Inventory", "Logout"].map((text, index) => (
                 <NavItem>
                   <NavLink href={text}>
                     <ListItem button key={text}>
@@ -185,7 +184,6 @@ export default function PersistentDrawerLeft() {
               <Route path="/inventory" component={Inventory} />
               <Route path="/add-products" component={ProductForm} />
               <Route path="/logout" component={Logout} />
-              <Route path="/batches" component={Batch} />
               <Route path="/" component={Home} exact />
               <Route path="/settings" component={Settings} />
               <Route path="/workers" component={Workers} />
