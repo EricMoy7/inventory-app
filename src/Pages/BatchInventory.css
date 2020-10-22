@@ -1,0 +1,6 @@
+.batch-selector {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  margin: 25px;
+}

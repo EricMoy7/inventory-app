@@ -38,13 +38,28 @@ const Product = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [uid, setUid] = useState(props.uid);
 
+  const batchesDB = db.collection(`users/${props.uid}/batches/current/batches`);
+
   useEffect(() => {
     const inventory = db.collection(props.inventoryPath);
     const headers = db.doc(props.headersPath);
+    getBatches();
     getHeaderData(headers);
     getInventoryData(inventory);
     setIsLoading(false);
   }, []);
+
+  function getBatches() {
+    const unsubscribe = batchesDB
+      .where("currentBatch", "==", true)
+      .onSnapshot((snapshot) => {
+        const data = snapshot.docs.map((doc) => doc.data());
+        for (let batch of data) {
+          setCurrentBatch(batch.batchName);
+        }
+      });
+    return () => unsubscribe();
+  }
 
   function getInventoryData(inventory) {
     const unsubscribe = inventory.onSnapshot((snapshot) => {
@@ -199,7 +214,7 @@ const Product = (props) => {
                 if (doc.exists) {
                   doc = doc.data();
                   const batchInventory = db.collection(
-                    `users/${uid}/batches/current/batches/${batchName}/inventory`
+                    `users/${uid}/batches/current/batches/${currentBatch}/inventory`
                   );
 
                   let today = new Date();

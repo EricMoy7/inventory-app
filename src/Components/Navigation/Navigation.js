@@ -32,6 +32,7 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
 
 import Inventory from "../../Pages/MainInventory";
+import BatchInventory from "../../Pages/BatchInventory";
 
 const drawerWidth = 240;
 
@@ -160,7 +161,7 @@ export default function PersistentDrawerLeft() {
             </div>
             <Divider />
             <List>
-              {["Home", "Inventory", "Logout"].map((text, index) => (
+              {["Home", "Inventory", "Batches", "Logout"].map((text, index) => (
                 <NavItem>
                   <NavLink href={text}>
                     <ListItem button key={text}>
@@ -188,6 +189,7 @@ export default function PersistentDrawerLeft() {
               <Route path="/settings" component={Settings} />
               <Route path="/workers" component={Workers} />
               <Route path="/shipment" component={Selector} />
+              <Route path="/batches" component={BatchInventory} />
             </Switch>
           </main>
         </Router>
