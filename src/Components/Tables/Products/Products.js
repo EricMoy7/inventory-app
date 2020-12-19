@@ -98,25 +98,20 @@ const Product = (props) => {
 
   const handleModalHide = () => {
     setModal(false);
-    const batchUpdateQuantity = db
-      .collection("users")
-      .doc(uid)
-      .collection("batches")
-      .doc(currentBatch)
-      .collection("Inventory")
-      .doc(currentSKU);
+    const batchUpdateQuantity = db.doc(
+      `users/${uid}/batches/current/batches/${currentBatch}/inventory/${currentSKU}`
+    );
     batchUpdateQuantity.set(
       {
         quantity: values.quantity,
       },
       { merge: true }
     );
-    Axios.put(
-      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/productDetails/updateSingle/onHand`,
-      {
-        params: { uid },
-        body: { rowData },
-      }
+    console.log({ uid, rowData });
+    Axios.post(
+      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/inventory/updateSingle/onHand`,
+      rowData.rowData,
+      { params: { uid } }
     );
   };
 
@@ -207,8 +202,6 @@ const Product = (props) => {
               setRowData({ rowData });
               const MSKU = rowData.MSKU;
               const dbMSKU = db.doc(`${props.inventoryPath}/${MSKU}`);
-
-              let batchName = await getCurrentBatch();
 
               dbMSKU.get().then((doc) => {
                 if (doc.exists) {

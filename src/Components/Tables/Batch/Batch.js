@@ -29,6 +29,7 @@ const Batch = (props) => {
   const [singleAction, setSingleAction] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [batches, setBatches] = useState([]);
+  const [currentBatch, setCurrentBatch] = useState("");
 
   const batchesDB = db.collection(`users/${props.uid}/batches/current/batches`);
 
@@ -45,6 +46,7 @@ const Batch = (props) => {
         if (batch.currentBatch === true) {
           const currentBatch = batch.batchName;
           getInventoryData(currentBatch);
+          setCurrentBatch(currentBatch);
           return currentBatch;
         }
       }
@@ -74,6 +76,7 @@ const Batch = (props) => {
   }
 
   const uid = props.uid;
+  const currentPath = `users/${uid}/batches/current/batches/${currentBatch}/inventory`;
 
   return (
     <Container fluid maxWidth="100%">
@@ -126,7 +129,7 @@ const Batch = (props) => {
           onRowAdd: (newData) =>
             new Promise((resolve, reject) => {
               setTimeout(() => {
-                db.doc(`${props.inventoryPath}/${newData.MSKU}`).set(newData, {
+                db.doc(`${currentPath}/${newData.MSKU}`).set(newData, {
                   merge: true,
                 });
                 resolve();
@@ -135,9 +138,7 @@ const Batch = (props) => {
           onRowUpdate: (newData, oldData) =>
             new Promise((resolve, reject) => {
               setTimeout(() => {
-                db.doc(`${props.inventoryPath}/${oldData.MSKU}`).update(
-                  newData
-                );
+                db.doc(`${currentPath}/${oldData.MSKU}`).update(newData);
 
                 resolve();
               }, 1000);
@@ -145,7 +146,7 @@ const Batch = (props) => {
           onRowDelete: (oldData) =>
             new Promise((resolve, reject) => {
               setTimeout(() => {
-                db.doc(`${props.inventoryPath}/${oldData.MSKU}`).delete();
+                db.doc(`${currentPath}/${oldData.MSKU}`).delete();
 
                 resolve();
               }, 1000);

@@ -3,6 +3,8 @@ import Batch from "../Components/Tables/Batch/Batch";
 import BatchSelector from "../Components/Tables/Batch/Utilities/BatchSelector";
 import { db } from "../Components/Firebase";
 import { FormControl, Select, Container, Paper } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Axios from "axios";
 import "./BatchInventory.css";
 
 class BatchInventory extends React.Component {
@@ -29,6 +31,16 @@ class BatchInventory extends React.Component {
             uid={this.uid}
             className="batch-selector"
           />
+          <Button
+            onClick={() => {
+              Axios.get(
+                `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/shipping/currentBatchToShipment`,
+                { params: { uid: this.uid } }
+              );
+            }}
+          >
+            Move Batch To Shipment
+          </Button>
         </Paper>
         <Batch uid={this.uid} />
       </div>
