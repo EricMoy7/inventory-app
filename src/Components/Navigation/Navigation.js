@@ -161,20 +161,25 @@ export default function PersistentDrawerLeft() {
             </div>
             <Divider />
             <List>
-              {["Home", "Inventory", "Batches", "Logout", "Shipment"].map(
-                (text, index) => (
-                  <NavItem>
-                    <NavLink href={text}>
-                      <ListItem button key={text}>
-                        <ListItemIcon>
-                          {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                      </ListItem>
-                    </NavLink>
-                  </NavItem>
-                )
-              )}
+              {[
+                "Home",
+                "Inventory",
+                "Add-Products",
+                "Batches",
+                "Logout",
+                "Shipment",
+              ].map((text, index) => (
+                <NavItem>
+                  <NavLink href={text}>
+                    <ListItem button key={text}>
+                      <ListItemIcon>
+                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  </NavLink>
+                </NavItem>
+              ))}
             </List>
           </Drawer>
           <main
