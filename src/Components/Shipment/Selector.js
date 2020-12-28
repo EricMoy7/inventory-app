@@ -30,6 +30,8 @@ export default function Selector() {
   const [spacing, setSpacing] = React.useState(2);
   const classes = useStyles();
 
+  const uid = JSON.parse(sessionStorage.getItem("userData")).uid;
+
   return (
     <Grid container className={classes.root} spacing={2}>
       <Grid item xs={12}>
@@ -43,7 +45,16 @@ export default function Selector() {
 
           <Grid item>
             <Paper className={classes.paper}>
-              <Button>Create Inbound Shipment Plan</Button>
+              <Button
+                onClick={() => {
+                  Axios.get(
+                    "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/shipping",
+                    { params: { uid } }
+                  );
+                }}
+              >
+                Create Inbound Shipment Plan
+              </Button>
             </Paper>
           </Grid>
 
