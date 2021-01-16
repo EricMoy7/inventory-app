@@ -250,7 +250,7 @@ export default function SimpleModal() {
                   addressName: shipmentAddressName,
                   addressLine1: shipmentAddressLine1,
                   city: shipmentAddressCity,
-                  state: shipmentAddressCity,
+                  state: shipmentAddressState,
                   postalCode: shipmentAddressPostalCode,
                   countryCode: shipmentAddressCountryCode,
                 },

@@ -6,7 +6,7 @@ import { FormControl, Select, Container, Paper } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Axios from "axios";
 import "./BatchInventory.css";
-import CreateBatch from "../Components/Tables/Batch/Utilities/CreateBatch";
+import BatchCrud from "../Components/Tables/Batch/Utilities/BatchCrud";
 
 class BatchInventory extends React.Component {
   constructor(props) {
@@ -32,7 +32,7 @@ class BatchInventory extends React.Component {
             uid={this.uid}
             className="batch-selector"
           />
-          <CreateBatch uid={this.uid} />
+          <BatchCrud uid={this.uid} />
           <Button
             onClick={() => {
               Axios.get(

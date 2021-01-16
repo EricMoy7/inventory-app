@@ -8,12 +8,16 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Modal from "@material-ui/core/Modal";
+import Button from "@material-ui/core/Button";
 
 import MaterialTable from "material-table";
 import { renderTableStyle } from "../Tables/Products/Utilities/RenderingStyles";
 
+import Axios from "axios";
+
 export default function ShipmentLocations() {
   const [locations, setLocations] = useState([]);
+  const [location, setLocation] = useState("");
   const [open, setOpen] = useState(false);
   const [columns, setColumns] = useState([]);
   const [modalStyle] = useState(getModalStyle);
@@ -31,7 +35,8 @@ export default function ShipmentLocations() {
     },
     paper: {
       position: "absolute",
-      width: 1200,
+      width: 1500,
+      height: 900,
       backgroundColor: theme.palette.background.paper,
       border: "2px solid #000",
       boxShadow: theme.shadows[5],
@@ -99,14 +104,57 @@ export default function ShipmentLocations() {
     return () => unsubscribe;
   }
 
+  const createShipmentButton = (
+    <Button
+      onClick={() => {
+        Axios.get(
+          "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/shipping/createInboundShipment",
+          {
+            params: {
+              uid,
+              shipmentName: `${currentShipment}_${location}`,
+              shipmentId: location,
+            },
+          }
+        );
+      }}
+    >
+      Create Shipment
+    </Button>
+  );
+
+  const weightEstimate = (
+    <Button
+      onClick={() => {
+        let weight = 0;
+        for (let row of rows) {
+          weight +=
+            parseFloat(row.productDimensions.Weight.Value) *
+            parseInt(row.quantity);
+          console.log(weight);
+        }
+        console.log(weight);
+      }}
+    >
+      Estimate Shipment Weight
+    </Button>
+  );
+
   const table = (
     <div style={modalStyle} className={classes.paper}>
-      <MaterialTable columns={columns} data={rows}></MaterialTable>
+      {createShipmentButton}
+      <MaterialTable
+        columns={columns}
+        data={rows}
+        options={{ maxBodyHeight: 600 }}
+      ></MaterialTable>
     </div>
   );
 
   return (
     <div>
+      {createShipmentButton}
+      {weightEstimate}
       <DymoPrinter data={rows} />
       <List>
         {locations.map((location) => (
@@ -114,6 +162,7 @@ export default function ShipmentLocations() {
             key={location}
             button
             onClick={() => {
+              setLocation(location.ShipmentId);
               getInventory(currentShipment, location.ShipmentId);
               handleOpen();
             }}

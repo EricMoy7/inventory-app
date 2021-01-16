@@ -24,21 +24,32 @@ export default function ShipmentPlanList() {
 
   const handleListItemClick = (event, idx, name) => {
     setSelectedIndex(idx);
-    console.log(name);
+
+    const batch = db.batch();
+    for (let batchName of data) {
+      const path = db.doc(`users/${uid}/shipments/${batchName}`);
+      batch.update(path, { currentShipment: false });
+    }
+    const activePath = db.doc(`users/${uid}/shipments/${name}`);
+    batch.update(activePath, { currentShipment: true });
+
+    batch.commit();
   };
 
   return (
-    <List>
-      {data.map((name, idx) => (
-        <ListItem
-          key={idx}
-          selected={selectedIndex === idx}
-          onClick={(e) => handleListItemClick(e, idx, name)}
-          button
-        >
-          {name}
-        </ListItem>
-      ))}
-    </List>
+    <div>
+      <List>
+        {data.map((name, idx) => (
+          <ListItem
+            key={idx}
+            selected={selectedIndex === idx}
+            onClick={(e) => handleListItemClick(e, idx, name)}
+            button
+          >
+            {name}
+          </ListItem>
+        ))}
+      </List>
+    </div>
   );
 }

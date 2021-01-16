@@ -2,7 +2,7 @@ import { db } from "../../../Firebase";
 import React, { useState } from "react";
 import { TextField, Button } from "@material-ui/core";
 
-const CreateBatch = (props) => {
+const BatchCrud = (props) => {
   const uid = props.uid;
   const [newBatchName, setNewBatchName] = useState("");
 
@@ -14,9 +14,9 @@ const CreateBatch = (props) => {
     return batches;
   }
 
-  function resetCurrentBatch() {
+  async function resetCurrentBatch() {
     const batch = db.batch();
-    const batches = getCurrentBatches();
+    const batches = await getCurrentBatches();
 
     for (let id of batches) {
       const path = db.doc(`users/${uid}/batches/current/batches/${id}`);
@@ -61,4 +61,4 @@ const CreateBatch = (props) => {
   );
 };
 
-export default CreateBatch;
+export default BatchCrud;

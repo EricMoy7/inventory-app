@@ -279,7 +279,7 @@ export default function DymoPrinter(props) {
   useEffect(() => {
     const script = document.createElement("script");
     script.src =
-      "http://labelwriter.com/software/dls/sdk/js/dymo.connect.framework.js";
+      "https://firebasestorage.googleapis.com/v0/b/inventorywebapp-d01bc.appspot.com/o/dymo.connect.framework.js?alt=media&token=29773759-4239-498e-8382-b82dabde5991";
     script.async = true;
     script.onload = () => initDymo();
     document.body.appendChild(script);
@@ -299,8 +299,10 @@ export default function DymoPrinter(props) {
     for (let product of data) {
       Dymo.label.framework.printLabel(
         "DYMO LabelWriter 450 Turbo",
-        "",
-        makeLabel(product["Product Name"], product.FNSKU, product.expiration),
+        Dymo.label.framework.createLabelWriterPrintParamsXml({
+          copies: parseInt(product.quantity),
+        }),
+        makeLabel(product.name, product.FNSKU, product.expiration),
         ""
       );
     }

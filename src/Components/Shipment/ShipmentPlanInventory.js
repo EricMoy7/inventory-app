@@ -45,9 +45,52 @@ export default function ShipmentPlanInventory() {
     return () => unsubscribe;
   }
 
+  const currentPath = `${shipmentDB}/${currentShipment}/inventory`;
+
   return (
     <div>
-      <MaterialTable columns={columns} data={rows}></MaterialTable>
+      <MaterialTable
+        columns={columns}
+        data={rows}
+        editable={{
+          onBulkUpdate: (changes) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                /* setData([...data, newData]); */
+
+                resolve();
+              }, 1000);
+            }),
+          onRowAddCancelled: (rowData) => console.log("Row adding cancelled"),
+          onRowUpdateCancelled: (rowData) =>
+            console.log("Row editing cancelled"),
+          onRowAdd: (newData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`${currentPath}/${newData.MSKU}`).set(newData, {
+                  merge: true,
+                });
+                resolve();
+              }, 1000);
+            }),
+          onRowUpdate: (newData, oldData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`${currentPath}/${oldData.MSKU}`).update(newData);
+
+                resolve();
+              }, 1000);
+            }),
+          onRowDelete: (oldData) =>
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                db.doc(`${currentPath}/${oldData.MSKU}`).delete();
+
+                resolve();
+              }, 1000);
+            }),
+        }}
+      ></MaterialTable>
     </div>
   );
 }

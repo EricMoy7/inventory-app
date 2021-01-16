@@ -48,12 +48,12 @@ export default function Selector() {
               <Button
                 onClick={() => {
                   Axios.get(
-                    "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/shipping",
+                    "https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/shipping/parseShipmentLocations",
                     { params: { uid } }
                   );
                 }}
               >
-                Create Inbound Shipment Plan
+                Parse Shipment Locations
               </Button>
             </Paper>
           </Grid>
