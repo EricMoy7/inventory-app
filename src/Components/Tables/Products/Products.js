@@ -37,7 +37,7 @@ const Product = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [uid, setUid] = useState(props.uid);
 
-  const {register, handleSubmit} = useForm();
+  const {register, handleSubmit, watch, errors} = useForm();
 
   const batchesDB = db.collection(`users/${props.uid}/batches/current/batches`);
 
@@ -338,10 +338,12 @@ const Product = (props) => {
           <form onSubmit={handleSubmit(onSubmit)}>
 
             <label>Quantity:</label>
-            <input name="quantity" ref={register} />
+            <input name="quantity" ref={register({ required: true})} />
+            {errors.quantity && <p>This field needs to be a integer.</p>}
 
             <label>Expiration Date:</label>
-            <input name="expiration" ref={register} />
+            <input name="expiration" ref={register({pattern: /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/ })} />
+            {errors.expiration && <p>This field needs to in date format (MM/DD/YYYY).</p>}
             <input type="submit"/>
           </form>
         </Modal.Body>
