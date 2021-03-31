@@ -8,10 +8,10 @@ import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import StoreIcon from "@material-ui/icons/Store";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import { Modal, Form, Button } from "react-bootstrap";
-import { useForm } from "./useForm";
 import SimplePopover from "./Utilities/Popover";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,10 +33,11 @@ const Product = (props) => {
   const [currentBatch, setCurrentBatch] = useState("");
   const [modal, setModal] = useState(false);
   const [currentSKU, setCurrentSKU] = useState(null);
-  const [values, handleChange] = useForm({ quantity: 0 });
   const [rowData, setRowData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [uid, setUid] = useState(props.uid);
+
+  const {register, handleSubmit} = useForm();
 
   const batchesDB = db.collection(`users/${props.uid}/batches/current/batches`);
 
@@ -78,19 +79,17 @@ const Product = (props) => {
     return () => unsubscribe;
   }
 
-  useEffect(() => {}, [values.quantity]);
-
-  const getCurrentBatch = async () => {
-    const dbBatches = db.collection(`/users/${uid}/batches/current/batches`);
-    const queryForCurrentBatch = dbBatches.where("currentBatch", "==", true);
-    let currentBatch = await queryForCurrentBatch.get().then((snap) => {
-      if (snap.exists) {
-        setCurrentBatch(snap.docs[0].id);
-        return snap.docs[0].id;
-      }
-    });
-    return currentBatch;
-  };
+  // const getCurrentBatch = async () => {
+  //   const dbBatches = db.collection(`/users/${uid}/batches/current/batches`);
+  //   const queryForCurrentBatch = dbBatches.where("currentBatch", "==", true);
+  //   let currentBatch = await queryForCurrentBatch.get().then((snap) => {
+  //     if (snap.exists) {
+  //       setCurrentBatch(snap.docs[0].id);
+  //       return snap.docs[0].id;
+  //     }
+  //   });
+  //   return currentBatch;
+  // };
 
   const handleModalShow = () => {
     setModal(true);
@@ -98,22 +97,25 @@ const Product = (props) => {
 
   const handleModalHide = () => {
     setModal(false);
-    const batchUpdateQuantity = db.doc(
-      `users/${uid}/batches/current/batches/${currentBatch}/inventory/${currentSKU}`
-    );
-    batchUpdateQuantity.set(
-      {
-        quantity: values.quantity,
-      },
-      { merge: true }
-    );
-    console.log({ uid, rowData });
-    Axios.post(
-      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/inventory/updateSingle/onHand`,
-      rowData.rowData,
-      { params: { uid } }
-    );
   };
+
+  const onSubmit = data =>
+  {const batchUpdateQuantity = db.doc(
+    `users/${uid}/batches/current/batches/${currentBatch}/inventory/${currentSKU}`
+  );
+  batchUpdateQuantity.set(
+    {
+      quantity: data.quantity,
+      expiration: data.expiration
+    },
+    { merge: true }
+  );
+  Axios.post(
+    `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/inventory/updateSingle/onHand`,
+    rowData.rowData,
+    { params: { uid } }
+  );
+};
 
   return (
     <Container fluid maxWidth="100%">
@@ -333,18 +335,15 @@ const Product = (props) => {
           <Modal.Title>Product Quantity</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Quantity</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter Quantity"
-                name="quantity"
-                value={values.quantity}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Form>
+          <form onSubmit={handleSubmit(onSubmit)}>
+
+            <label>Quantity:</label>
+            <input name="quantity" ref={register} />
+
+            <label>Expiration Date:</label>
+            <input name="expiration" ref={register} />
+            <input type="submit"/>
+          </form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleModalHide}>
