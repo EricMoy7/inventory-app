@@ -7,11 +7,12 @@ import { renderTableStyle } from "./Utilities/RenderingStyles";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 import StoreIcon from "@material-ui/icons/Store";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import { Modal, Form, Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import SimplePopover from "./Utilities/Popover";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { useForm } from "react-hook-form";
+import style from "./Product.module.css"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,8 +100,9 @@ const Product = (props) => {
     setModal(false);
   };
 
-  const onSubmit = data =>
-  {const batchUpdateQuantity = db.doc(
+  const onSubmit = data => {
+    console.log(errors)
+    const batchUpdateQuantity = db.doc(
     `users/${uid}/batches/current/batches/${currentBatch}/inventory/${currentSKU}`
   );
   batchUpdateQuantity.set(
@@ -115,6 +117,7 @@ const Product = (props) => {
     rowData.rowData,
     { params: { uid } }
   );
+  handleModalHide()
 };
 
   return (
@@ -330,31 +333,23 @@ const Product = (props) => {
           },
         ]}
       />
-      <Modal show={modal} onhide={handleModalHide}>
+      <Modal show={modal} onHide={handleModalHide}>
         <Modal.Header closeButton>
           <Modal.Title>Product Quantity</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form onSubmit={handleSubmit(onSubmit)}>
 
-            <label>Quantity:</label>
-            <input name="quantity" ref={register({ required: true})} />
-            {errors.quantity && <p>This field needs to be a integer.</p>}
+            <label className={style.label}>Quantity</label>
+            <input className={style.input} name="quantity" type="number" ref={register({ required: true, min: 1, max: 100})} />
+            {errors.quantity && <p className={style.error}>This field needs to be a integer (1-100).</p>}
 
-            <label>Expiration Date:</label>
-            <input name="expiration" ref={register({pattern: /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/ })} />
-            {errors.expiration && <p>This field needs to in date format (MM/DD/YYYY).</p>}
-            <input type="submit"/>
+            <label className={style.label}>Expiration Date</label>
+            <input className={style.input} name="expiration" type="date" ref={register()} />
+            {errors.expiration && <p className={style.error}>This field needs to in date format (MM/DD/YYYY).</p>}
+            <input className={style.button} type="submit"/>
           </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalHide}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleModalHide}>
-            Submit
-          </Button>
-        </Modal.Footer>
       </Modal>
     </Container>
   );
