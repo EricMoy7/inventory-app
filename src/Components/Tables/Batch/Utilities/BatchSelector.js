@@ -26,7 +26,6 @@ const BatchSelector = (props) => {
     db.collection(batchesDB).onSnapshot((snap) => {
       const data = snap.docs.map((doc) => doc.data());
       setCurrentBatches(data);
-      console.log(data.length);
       if (data.length > 1) {
         for (let doc of data) {
           if (doc.currentBatch === true) {
@@ -34,11 +33,13 @@ const BatchSelector = (props) => {
           }
         }
       } else {
+        if (data[0] !== undefined) {
         db.doc(`${batchesDB + data[0].batchName}`).update({
           currentBatch: true,
         });
         setCurrentBatch(data[0].batchName);
       }
+    }
     });
   }
 
