@@ -15,7 +15,7 @@ const BatchCrud = (props) => {
 
   //*FIX*//
   useEffect(() => {
-    getBatches();
+    getCurrentBatches();
   }, []);
 
   async function getCurrentBatches() {
@@ -23,32 +23,15 @@ const BatchCrud = (props) => {
       .collection(`users/${uid}/batches/current/batches`)
       .get();
     batches = batches.docs.map((doc) => doc.id);
-    return batches;
-  }
 
-//*FIX*//
-//get batches has get current batches
-function getBatches() {
-  db.collection(batchesDB).onSnapshot((snap) => {
-    const data = snap.docs.map((doc) => doc.data());
-    setCurrentBatches(data);
-    if (data.length > 1) {
-      for (let doc of data) {
-        if (doc.currentBatch === true) {
-          setCurrentBatch(doc.batchName);
-        }
-      }
-    } else {
-      console.log(data)
-      if (data) {
-        db.doc(`${batchesDB + data[0].batchName}`).update({
-          currentBatch: true,
-        });
-        setCurrentBatch(data[0].batchName);
+    if (batches.length !== 0) {
+      for (let name of batches) {
+        const data = await db.doc(`users/${uid}/batches/current/batches/${name}`).get()
+        setCurrentBatch(data.data().batchName)
       }
     }
-  });
-}
+    return batches;
+  }
 
   async function resetCurrentBatch() {
     const batch = db.batch();
@@ -58,6 +41,7 @@ function getBatches() {
       const path = db.doc(`users/${uid}/batches/current/batches/${id}`);
       batch.update(path, { currentBatch: false });
     }
+    getCurrentBatches()
     return batch.commit();
   }
 
