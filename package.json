@@ -10,6 +10,8 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.21.1",
     "bootstrap": "^4.5.0",
+    "browserlist": "^1.0.1",
+    "caniuse-lite": "^1.0.30001228",
     "dymojs": "^1.2.0",
     "firebase": "^8.3.1",
     "material-table": "^1.62.0",

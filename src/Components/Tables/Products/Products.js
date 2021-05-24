@@ -123,7 +123,7 @@ const Product = (props) => {
   const onChangeColumnHidden = (hidden, column) => {
     console.log(hidden)
     Axios.put(
-      `http://localhost:5001/inventorywebapp-d01bc/us-central1/inventory/headers/hide`, 
+      `https://us-central1-inventorywebapp-d01bc.cloudfunctions.net/inventory/headers/hide`, 
       null,
       { params: { uid, hidden, column} }
     )
