@@ -27,7 +27,9 @@
     "react-scripts": "^4.0.3",
     "react-strap": "0.0.1",
     "react-toastify": "^6.0.8",
-    "reactstrap": "^8.4.1"
+    "react-vis": "^1.11.7",
+    "reactstrap": "^8.4.1",
+    "tabler-react": "^2.0.0-alpha.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -120,12 +120,25 @@ const Product = (props) => {
   handleModalHide()
 };
 
+  const onChangeColumnHidden = (hidden, column) => {
+    console.log(hidden)
+    Axios.put(
+      `http://localhost:5001/inventorywebapp-d01bc/us-central1/inventory/headers/hide`, 
+      null,
+      { params: { uid, hidden, column} }
+    )
+  }
+
   return (
     <Container fluid maxWidth="100%">
       <SimplePopover uid={uid} currentBatch={currentBatch}></SimplePopover>
       <MaterialTable
         isLoading={isLoading}
+        onChangeColumnHidden={(column, hidden) => {
+          onChangeColumnHidden(hidden, column)
+        }}
         options={{
+          columnsButton: true,
           headerStyle: {
             position: "sticky",
             top: 0,
@@ -138,7 +151,6 @@ const Product = (props) => {
             alignText: "center",
           },
           padding: "dense",
-          actionsColumnIndex: -1,
           filtering: true,
           grouping: false,
           exportButton: true,
